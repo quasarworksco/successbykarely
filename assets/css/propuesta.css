@@ -709,3 +709,109 @@
 @media (max-width: 899px) {
   .planes .plan-recomendado { order: -1; margin-top: 14px; }
 }
+
+/* ==========================================================================
+   Pulido: ritmo vino / claro y capturas reales en dispositivos
+   ========================================================================== */
+/* Tarjetas claras sobre vino: panel marfil sólido y legible */
+.seccion-oscura .glass-claro {
+  background: rgba(255, 252, 250, .97);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  color: var(--tinta);
+  box-shadow: 0 34px 70px -40px rgba(20, 4, 10, .8);
+}
+.seccion-oscura .glass-claro :focus-visible { outline-color: var(--vino); }
+.seccion-oscura .fases li { background: rgba(255, 252, 250, .08); border-color: rgba(246, 220, 185, .3); color: var(--oro-claro); }
+.seccion-oscura .fases b { color: var(--oro-medio); }
+
+/* Proceso + cierre en una sola sección */
+.seccion-cierre .cabecera-seccion .titulo-seccion { color: var(--blanco); }
+.cta-final.cierre { margin-top: clamp(64px, 9vw, 110px); padding-top: clamp(48px, 7vw, 80px); border-top: 1px solid rgba(246, 220, 185, .18); }
+
+/* ---------- Dispositivos (laptop + teléfono) ---------- */
+.dispositivos { position: relative; margin: 0; padding-bottom: 7%; }
+.dispositivos img { display: block; width: 100%; height: auto; }
+.laptop { width: 86%; filter: drop-shadow(0 40px 50px rgba(58, 14, 29, .35)); }
+.laptop-pantalla {
+  position: relative;
+  padding: 2.4% 2.4% 0;
+  border-radius: 16px 16px 0 0;
+  background: linear-gradient(160deg, #2a0e17, #14060b);
+  border: 1px solid rgba(246, 220, 185, .22);
+  border-bottom: 0;
+}
+.laptop-pantalla::before { content: ''; position: absolute; top: .9%; left: 50%; width: 5px; height: 5px; border-radius: 50%; background: rgba(246, 220, 185, .35); transform: translateX(-50%); }
+.laptop-pantalla img { border-radius: 6px 6px 0 0; aspect-ratio: 1440 / 900; object-fit: cover; object-position: top; }
+.laptop-base {
+  position: relative;
+  height: 16px;
+  width: 112%;
+  margin-left: -6%;
+  border-radius: 2px 2px 16px 16px;
+  background: linear-gradient(180deg, #efe2d9 0%, #d7c3b8 55%, #b59f94 100%);
+}
+.laptop-base::before { content: ''; position: absolute; top: 0; left: 50%; width: 16%; height: 6px; border-radius: 0 0 8px 8px; background: #c8b2a6; transform: translateX(-50%); }
+.telefono {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 25%;
+  padding: 1.1%;
+  border-radius: 26px;
+  background: linear-gradient(160deg, #2a0e17, #14060b);
+  border: 1px solid rgba(246, 220, 185, .3);
+  box-shadow: 0 30px 50px -20px rgba(20, 4, 10, .6);
+}
+.telefono img { border-radius: 20px; aspect-ratio: 390 / 844; object-fit: cover; object-position: top; }
+.telefono::before { content: ''; position: absolute; top: 2.4%; left: 50%; z-index: 1; width: 30%; height: 3.2%; border-radius: 99px; background: #14060b; transform: translateX(-50%); }
+.modulo.invertido .dispositivos .laptop { margin-left: auto; }
+.modulo.invertido .dispositivos .telefono { right: auto; left: 0; }
+.solo-laptop { padding-bottom: 0; }
+.solo-laptop .laptop { width: 100%; }
+.dispositivos figcaption {
+  margin-top: 18px;
+  font-size: .78rem;
+  color: var(--tinta-suave);
+  text-align: center;
+}
+.seccion-oscura .dispositivos figcaption { color: rgba(246, 220, 185, .7); }
+.modulo .dispositivos figcaption { text-align: left; }
+.modulo.invertido .dispositivos figcaption { text-align: right; }
+
+/* Vitrina grande en "Ya en vivo" */
+.vitrina { margin: clamp(40px, 6vw, 72px) auto 0; max-width: 1040px; padding-bottom: 9%; }
+.vitrina .laptop { width: 78%; margin-inline: auto; }
+.vitrina .telefono { width: 19%; right: 1%; }
+.vitrina .telefono-2 { right: auto; left: 1%; bottom: 3%; width: 17%; }
+.vitrina figcaption { margin-top: 26px; }
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .dispositivos .laptop, .dispositivos .telefono { transition: transform .6s var(--ease); }
+  .modulo:hover .dispositivos .laptop { transform: translateY(-4px); }
+  .modulo:hover .dispositivos .telefono { transform: translateY(-10px); }
+}
+@media (max-width: 640px) {
+  .laptop-base { height: 10px; }
+  .telefono { border-radius: 16px; padding: 1.4%; }
+  .telefono img { border-radius: 12px; }
+  .vitrina .laptop { width: 100%; }
+  .vitrina .telefono { width: 26%; right: -2%; }
+  .vitrina .telefono-2 { width: 23%; left: -2%; }
+}
+.modulo .dispositivos:not(.solo-laptop) figcaption { padding-right: 28%; }
+.modulo.invertido .dispositivos:not(.solo-laptop) figcaption { padding-right: 0; padding-left: 28%; }
+@media (max-width: 899px) {
+  /* En celular la imagen va primero: se entiende el módulo de un vistazo */
+  .modulo .modulo-visual { order: -1; margin-bottom: 4px; }
+  .modulo .dispositivos:not(.solo-laptop) figcaption,
+  .modulo.invertido .dispositivos:not(.solo-laptop) figcaption { padding: 0; }
+  .dispositivos figcaption, .modulo .dispositivos figcaption { text-align: center !important; margin-top: 12px; }
+  .vitrina { padding-bottom: 20%; }
+  .vitrina figcaption { position: absolute; left: 0; right: 0; bottom: -8px; }
+}
+@media (max-width: 899px) {
+  .modulo .dispositivos figcaption { display: none; }
+  .vitrina { padding-bottom: 26%; }
+  .vitrina figcaption { bottom: -30px; }
+}
