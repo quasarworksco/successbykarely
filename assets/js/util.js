@@ -301,14 +301,33 @@ export function embedVideo(url, titulo = '') {
 
 /* DOMPurify bajo demanda para contenido con formato */
 let promesaPurify = null;
-export async function sanearHTML(html = '') {
-  promesaPurify ??= import('https://cdn.jsdelivr.net/npm/dompurify@3.1.6/+esm').then((m) => m.default).catch(() => null);
+// Únicos reproductores que pueden incrustarse (videos del blog y lecciones)
+const IFRAMES_PERMITIDOS = /^https:\/\/(www\.youtube(-nocookie)?\.com\/embed\/|player\.vimeo\.com\/video\/)/i;
+export async function sanearHTML(html = '', { videos = false } = {}) {
+  promesaPurify ??= import('https://cdn.jsdelivr.net/npm/dompurify@3.1.6/+esm').then((m) => {
+    const purify = m.default;
+    // Los iframes que no sean de YouTube/Vimeo se eliminan; los válidos se endurecen
+    purify.addHook('uponSanitizeElement', (nodo, datos) => {
+      if (datos.tagName === 'iframe' && !IFRAMES_PERMITIDOS.test(nodo.getAttribute('src') || '')) nodo.remove();
+    });
+    purify.addHook('afterSanitizeAttributes', (nodo) => {
+      if (nodo.tagName === 'IFRAME') {
+        nodo.setAttribute('loading', 'lazy');
+        nodo.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+        nodo.setAttribute('allow', 'accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
+      }
+      // Enlaces que abren otra pestaña siempre con rel seguro
+      if (nodo.tagName === 'A' && nodo.getAttribute('target') === '_blank') nodo.setAttribute('rel', 'noopener noreferrer');
+    });
+    return purify;
+  }).catch(() => null);
   const purify = await promesaPurify;
   if (!purify) return escaparHTML(String(html).replace(/<[^>]+>/g, ' '));
   return purify.sanitize(html, {
     FORBID_TAGS: ['style', 'form', 'input', 'button', 'textarea', 'select'],
     ALLOWED_URI_REGEXP: /^(?:https?:|mailto:|tel:|#)/i,
-    ADD_ATTR: ['target', 'rel'],
+    ADD_TAGS: videos ? ['iframe'] : [],
+    ADD_ATTR: videos ? ['target', 'rel', 'allowfullscreen', 'frameborder'] : ['target', 'rel'],
   });
 }
 

@@ -18,6 +18,7 @@ import {
 } from './portal-cursos.js';
 import { iniciarTareas, cargarTareas, detenerTareas, pintarPlan, tareasPendientes, itemTarea } from './portal-tareas.js';
 import { iniciarDocumentos, escucharDocumentos, detenerDocumentos, pintarDocumentos } from './portal-documentos.js';
+import { iniciarArticulos, pintarArticulos, reiniciarArticulos } from './portal-articulos.js';
 import { iniciarChat, escucharChat, detenerChat, alMostrarMensajes, pintarMensajes, ultimosMensajes, noLeidos } from './portal-chat.js';
 
 document.documentElement.classList.add('js');
@@ -502,6 +503,7 @@ function navegar(vista, { enfocar = true } = {}) {
   if (vista === 'curso') { const [, cursoId, leccionId] = partesHash(); abrirCurso(cursoId, leccionId); }
   if (vista === 'plan') pintarPlan();
   if (vista === 'documentos') pintarDocumentos();
+  if (vista === 'articulos') pintarArticulos();
   alMostrarMensajes(vista === 'mensajes');
   pintarContadorMensajes();
   if (enfocar) { window.scrollTo(0, 0); titulo.focus({ preventScroll: true }); }
@@ -556,6 +558,7 @@ function iniciarApp() {
   iniciarTareas(ctx);
   iniciarDocumentos(ctx);
   iniciarChat(ctx);
+  iniciarArticulos(ctx);
 }
 
 async function salir() {
@@ -1002,7 +1005,7 @@ async function alCambiarSesion(user) {
   if (registrando) return; // el flujo de registro se encarga
   usuario = user;
   if (!user) {
-    detenerChat(); detenerDocumentos(); detenerCursos(); detenerTareas();
+    detenerChat(); detenerDocumentos(); reiniciarArticulos(); detenerCursos(); detenerTareas();
     perfil = null;
     botonOcupado($('#btn-entrar'), false);
     $('#e-contrasena').value = '';

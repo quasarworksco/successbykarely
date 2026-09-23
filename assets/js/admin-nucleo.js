@@ -154,6 +154,20 @@ export function cerrarModal(valor) {
 export const modalAbierto = () => !$('#modal-contenedor').hidden;
 
 /**
+ * Modal que devuelve una promesa con el `valor` del botón pulsado
+ * (undefined si se cierra con Esc o el fondo).
+ */
+export function dialogo({ titulo, html = '', acciones = [], ancho = '' }) {
+  return new Promise((resolver) => {
+    abrirModal({
+      titulo, html, ancho,
+      acciones: acciones.map((a) => ({ texto: a.texto, clase: a.clase || (a.principal ? 'btn-principal' : 'btn-linea-app'), fn: () => cerrarModal(a.valor) })),
+    });
+    resolverModal = resolver;
+  });
+}
+
+/**
  * Confirmación. Con `escribir`, pide teclear ese texto exacto (borrado definitivo).
  * @returns {Promise<boolean>}
  */
@@ -278,16 +292,45 @@ export async function recortarImagen(archivo, { ratio = null, anchoMax = 1600, t
 }
 
 /* ---------- Editor de texto enriquecido (Quill 2) ---------- */
-export async function crearEditor(contenedor, { html = '', placeholder = '', imagenes = null, alCambiar = null } = {}) {
+let ctaRegistrado = false;
+/**
+ * Editor Quill 2 con barra acotada.
+ * @param imagenes  (editor) => void  sube e inserta imágenes (Cloudinary)
+ * @param video     (editor) => void  pide la URL y la inserta ya convertida a "embed"
+ * @param cta       añade el botón de llamada a la acción (enlace con clase btn-articulo)
+ */
+export async function crearEditor(contenedor, { html = '', placeholder = '', imagenes = null, video = null, cta = null, alCambiar = null } = {}) {
   const Quill = await cargarLibreria('quill');
+  if (cta && !ctaRegistrado) {
+    // Enlace con clase propia: DOMPurify conserva la clase y el sitio lo pinta como botón dorado
+    const Link = Quill.import('formats/link');
+    class BotonCTA extends Link { static blotName = 'cta'; static tagName = 'A'; static className = 'btn-articulo'; }
+    Quill.register(BotonCTA, true);
+    ctaRegistrado = true;
+  }
   const barra = [
     [{ header: [2, 3, false] }],
     ['bold', 'italic', 'link'],
     [{ list: 'ordered' }, { list: 'bullet' }, 'blockquote'],
     imagenes ? ['image', 'video'] : ['video'],
-    ['clean'],
+    cta ? ['cta', 'clean'] : ['clean'],
   ];
-  const editor = new Quill(contenedor, { theme: 'snow', placeholder, modules: { toolbar: { container: barra, handlers: imagenes ? { image: () => imagenes(editor) } : {} } } });
+  const handlers = {};
+  if (imagenes) handlers.image = () => imagenes(editor);
+  if (video) handlers.video = () => video(editor);
+  if (cta) handlers.cta = () => cta(editor);
+  const editor = new Quill(contenedor, { theme: 'snow', placeholder, modules: { toolbar: { container: barra, handlers } } });
+  const botonCta = editor.getModule('toolbar')?.container.querySelector('.ql-cta');
+  if (botonCta) {
+    botonCta.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9 12h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+    botonCta.setAttribute('aria-label', t('adm.botonCta'));
+    botonCta.title = t('adm.botonCta');
+  }
+  // Etiquetas accesibles para los botones de la barra
+  const nombres = { bold: 'adm.negrita', italic: 'adm.cursiva', link: 'adm.enlace', blockquote: 'adm.cita', image: 'adm.foto', video: 'adm.videoInsertar', clean: 'adm.limpiarFormato' };
+  Object.entries(nombres).forEach(([clase, clave]) => {
+    editor.getModule('toolbar')?.container.querySelectorAll(`.ql-${clase}`).forEach((b) => { if (!b.hasAttribute('aria-label')) b.setAttribute('aria-label', t(clave)); });
+  });
   if (html) editor.clipboard.dangerouslyPasteHTML(html);
   editor.on('text-change', () => alCambiar?.());
   return editor;
@@ -334,6 +377,12 @@ registrarTextos({
     'adm.buscarPh': 'Buscar clientes, leads, cursos…  ( / )',
     'adm.sinResultados': 'Sin resultados para “{q}”.',
     'adm.cerrar': 'Cerrar',
+    'adm.botonCta': 'Botón de llamada a la acción',
+    'adm.negrita': 'Negrita',
+    'adm.cursiva': 'Cursiva',
+    'adm.cita': 'Cita destacada',
+    'adm.videoInsertar': 'Insertar video',
+    'adm.limpiarFormato': 'Quitar formato',
     'adm.guardar': 'Guardar',
     'adm.guardando': 'Guardando…',
     'adm.guardado': 'Cambios guardados',
@@ -401,6 +450,12 @@ registrarTextos({
     'adm.buscarPh': 'Search clients, leads, courses…  ( / )',
     'adm.sinResultados': 'No results for “{q}”.',
     'adm.cerrar': 'Close',
+    'adm.botonCta': 'Call-to-action button',
+    'adm.negrita': 'Bold',
+    'adm.cursiva': 'Italic',
+    'adm.cita': 'Pull quote',
+    'adm.videoInsertar': 'Insert video',
+    'adm.limpiarFormato': 'Clear formatting',
     'adm.guardar': 'Save',
     'adm.guardando': 'Saving…',
     'adm.guardado': 'Changes saved',

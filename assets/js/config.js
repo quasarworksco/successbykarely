@@ -66,6 +66,20 @@ export const CONFIG = {
 
   // Anti-spam del formulario: segundos mínimos antes de poder enviar
   formulario: { segundosMinimos: 4, esperaEntreEnvios: 60 },
+
+  blog: {
+    // Artículos por tanda en el listado ("Cargar más")
+    porPagina: 9,
+    // Cámbialo a true cuando el GitHub Action del blog esté activo:
+    // los enlaces para compartir usarán blog/{slug}/ (con vista previa en redes)
+    paginasEstaticas: false,
+    autora: {
+      nombre: 'Karely Paredes',
+      credenciales: 'MBA · Lean Six Sigma Black Belt',
+      bio_es: 'Arquitecta de sistemas para inmigrantes. Llegué a Estados Unidos con poco inglés y pocos recursos; hoy aplico Lean Six Sigma para que tu familia avance con un plan claro y medible.',
+      bio_en: 'Immigrant systems architect. I arrived in the United States with little English and few resources; today I apply Lean Six Sigma so your family can move forward with a clear, measurable plan.',
+    },
+  },
 };
 
 /* --------------------------------------------------------------------------
@@ -87,6 +101,17 @@ export const ETAPAS = [
   { n: 2, id: 'carrera', es: 'Carreras profesionales', en: 'Professional careers' },
   { n: 3, id: 'credito', es: 'Crédito personal', en: 'Personal credit' },
   { n: 4, id: 'empresa', es: 'Centro empresarial', en: 'Business center' },
+];
+
+/* Categorías del blog de respaldo (el panel las administra en postCategories) */
+export const CATEGORIAS_BLOG = [
+  { id: 'universidad', es: 'Planificación universitaria', en: 'College planning', order: 1 },
+  { id: 'carrera', es: 'Carreras profesionales', en: 'Professional careers', order: 2 },
+  { id: 'credito', es: 'Crédito personal', en: 'Personal credit', order: 3 },
+  { id: 'empresa', es: 'Centro empresarial', en: 'Business center', order: 4 },
+  { id: 'inmigracion', es: 'Inmigración y vida en EE. UU.', en: 'Immigration & life in the U.S.', order: 5 },
+  { id: 'historias', es: 'Historias de éxito', en: 'Success stories', order: 6 },
+  { id: 'noticias', es: 'Noticias de 6SGS', en: '6SGS news', order: 7 },
 ];
 
 /* Opciones de "¿Cómo nos conociste?" */

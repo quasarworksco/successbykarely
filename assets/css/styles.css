@@ -1134,7 +1134,8 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   transition: transform .35s var(--ease), box-shadow .35s var(--ease);
 }
 .tarjeta-post:hover { transform: translateY(-3px); box-shadow: 0 26px 50px -30px rgba(86, 23, 44, .45); }
-.tarjeta-post .portada { aspect-ratio: 16 / 9; }
+.tarjeta-post .portada { position: relative; overflow: hidden; aspect-ratio: 16 / 9; container-type: inline-size; background: var(--vino-profundo); }
+.tarjeta-post .etiqueta-exclusivo { justify-self: start; }
 .tarjeta-post-cuerpo { padding: 20px 22px 24px; display: grid; gap: 8px; }
 .tarjeta-post-meta { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: .85rem; color: var(--tinta-suave); }
 .tarjeta-post-cat { color: var(--oro-oscuro); font-weight: 500; }

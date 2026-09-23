@@ -3,32 +3,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Blog de Karely Paredes | Becas, FAFSA, crédito y LLC en español</title>
-  <meta name="description" content="Guías claras de Karely Paredes para inmigrantes en EE. UU.: becas y FAFSA en español, equivalencia de títulos, crédito para inmigrantes y cómo abrir tu LLC.">
+  <!-- Título, descripción, Open Graph y JSON-LD se actualizan al cargar el artículo -->
+  <title>Artículo | Blog de Karely Paredes</title>
+  <meta name="description" content="Guías claras de Karely Paredes para inmigrantes en Estados Unidos.">
   <meta name="author" content="Karely Paredes">
   <meta name="theme-color" content="#3A0E1D">
   <meta name="robots" content="index, follow, max-image-preview:large">
-  <!-- Raíz relativa del sitio (la usa blog.js para construir enlaces) -->
   <meta name="sbk-raiz" content="../">
 
   <link rel="canonical" href="https://successbykarely.dgp-link.com/blog/">
-  <link rel="alternate" hreflang="es" href="https://successbykarely.dgp-link.com/blog/">
-  <link rel="alternate" hreflang="en" href="https://successbykarely.dgp-link.com/blog/?lang=en">
-  <link rel="alternate" hreflang="x-default" href="https://successbykarely.dgp-link.com/blog/">
-  <link rel="alternate" type="application/rss+xml" title="Blog de Success by Karely" href="https://successbykarely.dgp-link.com/blog/feed.xml">
-
-  <meta property="og:type" content="website">
+  <meta property="og:type" content="article">
   <meta property="og:site_name" content="Success by Karely">
   <meta property="og:locale" content="es_US">
   <meta property="og:title" content="Blog de Karely Paredes | Success by Karely">
   <meta property="og:description" content="Guías claras para tu vida en Estados Unidos: becas, FAFSA, carrera, crédito y negocio.">
   <meta property="og:url" content="https://successbykarely.dgp-link.com/blog/">
   <meta property="og:image" content="https://successbykarely.dgp-link.com/assets/img/og-image.jpg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Blog de Karely Paredes | Success by Karely">
-  <meta name="twitter:description" content="Guías claras para tu vida en Estados Unidos: becas, FAFSA, carrera, crédito y negocio.">
+  <meta name="twitter:description" content="Guías claras para tu vida en Estados Unidos.">
   <meta name="twitter:image" content="https://successbykarely.dgp-link.com/assets/img/og-image.jpg">
 
   <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/favicon-32.png">
@@ -39,22 +32,14 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..700;1,400..600&family=Plus+Jakarta+Sans:ital,wght@0,300..700;1,400&display=swap">
   <link rel="stylesheet" href="../assets/css/styles.css">
   <link rel="stylesheet" href="../assets/css/blog.css">
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Blog",
-    "name": "Blog de Success by Karely",
-    "url": "https://successbykarely.dgp-link.com/blog/",
-    "inLanguage": ["es", "en"],
-    "author": { "@type": "Person", "name": "Karely Paredes", "url": "https://successbykarely.dgp-link.com/" },
-    "publisher": { "@type": "Organization", "name": "Success by Karely", "parentOrganization": { "@type": "Organization", "name": "6SGS Consultants" } }
-  }
-  </script>
+  <script type="application/ld+json" id="jsonld-articulo">{}</script>
   <script type="module" src="../assets/js/blog.js"></script>
 </head>
-<body class="pagina-blog" data-pagina="listado">
+<body class="pagina-blog pagina-articulo" data-pagina="articulo">
   <a class="saltar" href="#contenido" data-i18n="nav.saltar">Saltar al contenido</a>
+
+  <!-- Barra de progreso de lectura -->
+  <div class="progreso-lectura" id="progreso-lectura" role="progressbar" data-i18n-attr="aria-label:art.progreso" aria-label="Progreso de lectura" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
 
   <!-- ================= NAVEGACIÓN ================= -->
   <header class="nav" id="nav">
@@ -69,7 +54,7 @@
         <a href="../#historia" data-i18n="nav.historia">Mi historia</a>
         <a href="../#metodo" data-i18n="nav.metodo">El método</a>
         <a href="../#servicios" data-i18n="nav.servicios">Servicios</a>
-        <a href="./" aria-current="page">Blog</a>
+        <a href="./" aria-current="true">Blog</a>
         <a href="../#contacto" data-i18n="nav.contacto">Contacto</a>
       </nav>
       <div class="nav-acciones">
@@ -85,7 +70,7 @@
         <a href="../#historia" data-i18n="nav.historia">Mi historia</a>
         <a href="../#metodo" data-i18n="nav.metodo">El método</a>
         <a href="../#servicios" data-i18n="nav.servicios">Servicios</a>
-        <a href="./" aria-current="page">Blog</a>
+        <a href="./">Blog</a>
         <a href="../#contacto" data-i18n="nav.contacto">Contacto</a>
       </nav>
       <a class="btn btn-principal" href="../portal/" data-i18n="nav.miEspacio">Mi espacio</a>
@@ -93,46 +78,79 @@
   </header>
 
   <main id="contenido">
-    <!-- ================= CABECERA ================= -->
-    <section class="seccion-oscura blog-cabecera">
-      <div class="fondo-vivo" aria-hidden="true"><span class="orbe orbe-1"></span><span class="orbe orbe-2"></span><span class="orbe orbe-3"></span></div>
-      <div class="contenedor blog-cabecera-interior">
-        <p class="blog-sobretitulo">Blog · Karely Paredes</p>
-        <h1 class="blog-h1" data-i18n="blogp.h1">Guías claras para tu vida en Estados Unidos</h1>
-        <p class="intro" data-i18n="blogp.intro">Becas, FAFSA, carrera, crédito y negocio: lo que me hubiera gustado saber cuando llegué, explicado paso a paso.</p>
-        <form class="blog-buscar glass" role="search" id="form-buscar">
-          <label class="solo-lectores" for="blog-q" data-i18n="blogp.buscar">Buscar artículos</label>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-          <input type="search" id="blog-q" autocomplete="off" data-i18n-attr="placeholder:blogp.buscarPh" placeholder="Busca por tema, palabra o etiqueta…">
-        </form>
-      </div>
-    </section>
+    <div class="aviso-vista-previa" id="aviso-vista-previa" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span data-i18n="art.vistaPrevia">Vista previa: así se verá el artículo al publicarlo.</span>
+    </div>
 
-    <!-- ================= DESTACADO + LISTADO ================= -->
-    <section class="seccion-clara blog-listado" aria-labelledby="titulo-listado">
-      <div class="fondo-suave" aria-hidden="true"><span class="orbe orbe-1"></span><span class="orbe orbe-2"></span></div>
+    <!-- Portada a ancho completo con el título -->
+    <header class="articulo-portada seccion-oscura" id="articulo-portada">
+      <div class="articulo-portada-img" id="portada-img" aria-hidden="true"></div>
+      <div class="fondo-vivo" aria-hidden="true"><span class="orbe orbe-1"></span><span class="orbe orbe-2"></span></div>
+      <div class="contenedor articulo-portada-texto">
+        <a class="volver-blog" href="./">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>
+          <span data-i18n="art.volver">Volver al blog</span>
+        </a>
+        <p class="articulo-cat" id="articulo-cat"></p>
+        <h1 class="articulo-titulo" id="articulo-titulo"><span class="esqueleto-texto" data-i18n="art.cargando">Cargando artículo…</span></h1>
+        <p class="articulo-extracto" id="articulo-extracto"></p>
+        <div class="articulo-meta" id="articulo-meta"></div>
+      </div>
+    </header>
+
+    <div class="seccion-clara articulo-cuerpo-seccion">
+      <div class="contenedor articulo-layout">
+        <aside class="toc" id="toc" hidden>
+          <details class="toc-panel glass-claro" id="toc-panel" open>
+            <summary data-i18n="art.contenido">En este artículo</summary>
+            <nav id="toc-lista" data-i18n-attr="aria-label:art.contenido" aria-label="En este artículo"></nav>
+          </details>
+        </aside>
+
+        <article class="articulo" id="articulo" aria-labelledby="articulo-titulo">
+          <div class="prosa" id="prosa">
+            <div class="esqueleto esqueleto-linea"></div>
+            <div class="esqueleto esqueleto-linea"></div>
+            <div class="esqueleto esqueleto-linea corta"></div>
+          </div>
+
+          <div class="articulo-etiquetas" id="articulo-etiquetas"></div>
+          <p class="articulo-aviso" data-i18n="art.aviso">Información educativa: no constituye asesoría legal, financiera ni migratoria.</p>
+
+          <!-- Llamada a la acción final (configurable por artículo) -->
+          <div id="articulo-cta"></div>
+
+          <!-- Compartir -->
+          <section class="compartir" aria-labelledby="compartir-titulo" id="compartir" hidden>
+            <h2 id="compartir-titulo" data-i18n="art.compartir">Comparte este artículo</h2>
+            <div class="compartir-botones" id="compartir-botones"></div>
+          </section>
+
+          <!-- Caja de autora -->
+          <section class="autora glass-claro" aria-labelledby="autora-titulo">
+            <div class="autora-foto" data-espacio="autora_blog" data-ancho-max="400" data-sizes="120px"></div>
+            <div>
+              <h2 id="autora-titulo" class="autora-etiqueta" data-i18n="art.sobreAutora">Sobre la autora</h2>
+              <p class="autora-nombre" id="autora-nombre">Karely Paredes</p>
+              <p class="autora-cred" id="autora-cred"></p>
+              <p class="autora-bio" id="autora-bio"></p>
+              <ul class="redes redes-autora" id="redes-autora"></ul>
+            </div>
+          </section>
+        </article>
+      </div>
+    </div>
+
+    <!-- Relacionados -->
+    <section class="seccion-blanca relacionados" aria-labelledby="rel-titulo" id="relacionados" hidden>
       <div class="contenedor">
-        <div id="blog-destacado" class="blog-destacado-zona">
-          <div class="esqueleto esqueleto-revista" aria-hidden="true"></div>
-        </div>
-
-        <div class="blog-filtros">
-          <h2 id="titulo-listado" class="solo-lectores" data-i18n="blogp.filtrar">Filtrar por categoría</h2>
-          <div class="chips-categorias" id="chips-categorias" role="group" data-i18n-attr="aria-label:blogp.filtrar" aria-label="Filtrar por categoría"></div>
-          <div class="filtro-activo" id="filtro-etiqueta" hidden></div>
-          <p class="blog-conteo" id="blog-conteo" aria-live="polite"></p>
-        </div>
-
-        <div class="blog-grid" id="blog-grid" aria-busy="true">
-          <div class="esqueleto"></div><div class="esqueleto"></div><div class="esqueleto"></div>
-        </div>
-        <div class="blog-mas">
-          <button type="button" class="btn btn-linea" id="btn-mas" hidden data-i18n="blogp.cargarMas">Cargar más artículos</button>
-        </div>
+        <h2 id="rel-titulo" class="titulo-seccion" data-i18n="art.relacionados">Sigue leyendo</h2>
+        <div class="blog-grid" id="rel-grid"></div>
       </div>
     </section>
 
-    <!-- ================= BOLETÍN ================= -->
+    <!-- Boletín -->
     <section class="seccion-oscura blog-boletin-seccion" aria-labelledby="boletin-titulo">
       <div class="fondo-vivo" aria-hidden="true"><span class="orbe orbe-1"></span><span class="orbe orbe-3"></span></div>
       <div class="contenedor">
@@ -141,7 +159,6 @@
             <h2 id="boletin-titulo" data-i18n="blogp.boletinT">Recibe cada guía nueva en tu correo</h2>
             <p data-i18n="blogp.boletinD">Sin spam: artículos nuevos, fechas clave de FAFSA y talleres en vivo.</p>
           </div>
-          <!-- El formulario lo completa blog.js -->
         </div>
       </div>
     </section>

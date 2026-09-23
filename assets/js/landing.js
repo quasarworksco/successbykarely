@@ -13,6 +13,7 @@ import {
   urlCloudinary, srcsetCloudinary, enlaceWhatsApp,
 } from './util.js';
 import { iniciarI18n, t } from './i18n.js';
+import { leerCategorias, consultarPublicados, elegirDestacado, ordenEditorial, nombreCategoria, rutaArticulo } from './blog-datos.js';
 
 document.documentElement.classList.add('js');
 let idioma = iniciarI18n();
@@ -282,7 +283,7 @@ async function iniciarTestimonios() {
    6. Últimos artículos del blog
    ========================================================================== */
 let articulos = null;
-let categorias = {};
+let categorias = [];
 
 function portadaHTML(post, anchos, sizes) {
   if (!esURLSegura(post.coverUrl)) {
@@ -298,10 +299,10 @@ function portadaHTML(post, anchos, sizes) {
 function tarjetaPost(post, destacada) {
   const titulo = campo(post, 'title', idioma);
   const extracto = campo(post, 'excerpt', idioma);
-  const categoria = categorias[post.category] ? campo(categorias[post.category], 'name', idioma) : '';
+  const categoria = nombreCategoria(categorias, post.category, idioma);
   const minutos = post.readingMinutes ? t('blog.minutos', { n: post.readingMinutes }) : '';
   return `
-    <a class="tarjeta-post${destacada ? ' destacada' : ''}" href="blog/articulo.html?slug=${encodeURIComponent(post.slug || '')}">
+    <a class="tarjeta-post${destacada ? ' destacada' : ''}" href="${rutaArticulo(post.slug, '')}">
       ${portadaHTML(post, destacada ? [480, 800, 1200] : [320, 480, 800], destacada ? '(min-width: 900px) 55vw, 92vw' : '(min-width: 900px) 18vw, 92vw')}
       <div class="tarjeta-post-cuerpo">
         <p class="tarjeta-post-meta">
@@ -309,6 +310,7 @@ function tarjetaPost(post, destacada) {
           <span>${escaparHTML(formatearFecha(post.publishAt, idioma, { day: 'numeric', month: 'short', year: 'numeric' }))}</span>
           ${minutos ? `<span>${escaparHTML(minutos)}</span>` : ''}
         </p>
+        ${post.visibility === 'miembros' ? `<span class="etiqueta-exclusivo">${escaparHTML(t('blog.exclusivo'))}</span>` : ''}
         <h3>${escaparHTML(titulo)}</h3>
         ${destacada && extracto ? `<p>${escaparHTML(extracto)}</p>` : ''}
       </div>
@@ -328,30 +330,17 @@ function pintarBlog() {
       </div>`;
     return;
   }
-  const destacado = articulos.find((p) => p.featured) || articulos[0];
-  const resto = articulos.filter((p) => p !== destacado).slice(0, 3);
+  const destacado = elegirDestacado(articulos);
+  const resto = ordenEditorial(articulos).filter((p) => p !== destacado).slice(0, 3);
   rejilla.innerHTML = tarjetaPost(destacado, true) + resto.map((p) => tarjetaPost(p, false)).join('');
 }
 
 async function iniciarBlog() {
   const firebase = await cargarFirestore();
   if (firebase) {
-    const { db, fs } = firebase;
     try {
-      // Mismos filtros que exigen las reglas de Firestore
-      const [snapPosts, snapCategorias] = await Promise.all([
-        fs.getDocs(fs.query(
-          fs.collection(db, 'posts'),
-          fs.where('status', '==', 'publicado'),
-          fs.where('visibility', '==', 'publico'),
-          fs.where('publishAt', '<=', fs.Timestamp.now()),
-          fs.orderBy('publishAt', 'desc'),
-          fs.limit(8),
-        )),
-        fs.getDocs(fs.collection(db, 'postCategories')).catch(() => ({ docs: [] })),
-      ]);
-      categorias = Object.fromEntries(snapCategorias.docs.map((d) => [d.id, d.data()]));
-      articulos = snapPosts.docs.map((d) => ({ id: d.id, ...d.data() }));
+      // Mismos filtros que exigen las reglas de Firestore (ver blog-datos.js)
+      [categorias, articulos] = await Promise.all([leerCategorias(firebase), consultarPublicados(firebase, { limite: 12 })]);
     } catch (error) {
       console.warn('[blog] Sin artículos disponibles:', error.message);
       articulos = [];
