@@ -7,7 +7,7 @@ Sitio 100 % estático (HTML, CSS y JavaScript) publicado en **GitHub Pages**, co
 - Toda la configuración está en un solo archivo: `assets/js/config.js`
 - La especificación completa del proyecto está en `CLAUDE.md`
 
-> Esta guía crece con cada fase. Estado actual: **Fase 1** (base visual, landing y formulario de contacto).
+> Esta guía crece con cada fase. Estado actual: **Fase 2** (portal: registro, acceso, onboarding, inicio y perfil).
 
 ---
 
@@ -55,7 +55,6 @@ firebase deploy --only firestore:rules,firestore:indexes
 
 ## 3. Crear el primer administrador
 
-*(Disponible desde la Fase 2, cuando exista el registro en el portal.)*
 Regístrate en el portal → en Firebase **Authentication** copia tu **UID** → en Firestore crea el documento `admins/{TU_UID}` con los campos `role: "owner"`, `name`, `email` y `createdAt`.
 
 ## 4. Cloudinary (imágenes y archivos)
@@ -105,6 +104,17 @@ Revisa en **Settings → Upload → Upload presets → bzrjdfnu** que tenga:
 Mientras un valor siga pendiente, el sitio oculta ese botón o muestra “Muy pronto”, nunca un enlace roto.
 
 ---
+
+## Lista de pruebas (Fase 2: portal)
+
+- [ ] `portal/?registro=1` abre "Crear cuenta"; el paso 1 valida nombre, correo, teléfono y contraseña (mínimo 8, con indicador de fuerza).
+- [ ] Al crear la cuenta llega el correo de verificación y aparecen `users/{uid}` y `chats/{uid}` en Firestore.
+- [ ] El onboarding muestra 3 pantallas y recomienda la etapa según los servicios elegidos.
+- [ ] Inicio muestra el saludo, los anillos por etapa, la racha y el aviso "Confirma tu correo" (con "Reenviar" y "Ya lo confirmé").
+- [ ] Mi perfil guarda los cambios; el modo claro/oscuro se recuerda al volver.
+- [ ] Cerrar sesión y volver a entrar mantiene todos los datos.
+- [ ] "¿Olvidaste tu contraseña?" envía el enlace de recuperación.
+- [ ] En celular, el menú lateral se abre y se cierra (también con Esc).
 
 ## Lista de pruebas (Fase 1)
 
