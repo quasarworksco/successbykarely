@@ -928,3 +928,8 @@ export function iniciarI18n() {
   });
   return idioma;
 }
+
+/* Permite que cada módulo (p. ej. el panel admin) registre sus propios textos ES/EN */
+export function registrarTextos(extra) {
+  IDIOMAS.forEach((l) => Object.assign(TEXTOS[l], extra[l] || {}));
+}

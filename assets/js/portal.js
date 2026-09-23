@@ -760,7 +760,7 @@ async function cargarAnuncios() {
     const snap = await fb.fs.getDocs(fb.fs.query(fb.fs.collection(fb.db, 'announcements'), fb.fs.where('published', '==', true), fb.fs.limit(20)));
     anuncios = snap.docs.map((d) => d.data())
       .filter((a) => !a.deletedAt && a.title)
-      .sort((a, b) => (aFecha(b.createdAt)?.getTime() || 0) - (aFecha(a.createdAt)?.getTime() || 0));
+      .sort((a, b) => (a.order ?? 999) - (b.order ?? 999) || (aFecha(b.createdAt)?.getTime() || 0) - (aFecha(a.createdAt)?.getTime() || 0));
   } catch (error) {
     console.warn('[portal] Anuncios no disponibles:', error.message);
     anuncios = [];
