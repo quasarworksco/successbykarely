@@ -1,0 +1,141 @@
+rules_version = '2';
+
+// ============================================================================
+// Success by Karely — Reglas de seguridad de Cloud Firestore
+// Fase 1: funciones de rol, leads (formulario público) y contenido público
+// (testimonios, imágenes del sitio, categorías y artículos del blog).
+// Las colecciones de usuarios, CRM, chats y cursos se agregan en sus fases.
+// Todo lo que no aparece aquí queda DENEGADO.
+// ============================================================================
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Funciones de apoyo ----------
+    function signedIn() {
+      return request.auth != null;
+    }
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+    function adminDoc() {
+      return /databases/$(database)/documents/admins/$(request.auth.uid);
+    }
+    // Rol del administrador actual (owner | staff | editor)
+    function role() {
+      return get(adminDoc()).data.role;
+    }
+    // Cualquier rol de administración
+    function isAdmin() {
+      return signedIn() && exists(adminDoc());
+    }
+    function isOwnerRole() {
+      return isAdmin() && role() == 'owner';
+    }
+    // owner o staff: clientes, leads, mensajes, documentos
+    function isStaff() {
+      return isAdmin() && role() in ['owner', 'staff'];
+    }
+    // owner o editor: blog, cursos, imágenes, testimonios, anuncios
+    function isEditor() {
+      return isAdmin() && role() in ['owner', 'editor'];
+    }
+
+    // Texto opcional: si existe, debe ser string con longitud máxima
+    function optStr(d, campo, max) {
+      return !(campo in d) || (d[campo] is string && d[campo].size() <= max);
+    }
+    function reqStr(d, campo, min, max) {
+      return campo in d && d[campo] is string && d[campo].size() >= min && d[campo].size() <= max;
+    }
+
+    // ---------- Administradores ----------
+    match /admins/{uid} {
+      // Cada admin puede leer su propio documento (para saber su rol); el owner lee todos
+      allow read: if isOwner(uid) || isOwnerRole();
+      allow write: if isOwnerRole();
+    }
+
+    // ---------- Leads (formulario de contacto y boletín) ----------
+    function validLead(d) {
+      return d.keys().hasOnly([
+          'firstName', 'lastName', 'email', 'phone', 'country', 'state', 'services',
+          'message', 'referral', 'language', 'source', 'status', 'consent', 'createdAt'
+        ])
+        && d.keys().hasAll(['email', 'language', 'source', 'status', 'consent', 'createdAt'])
+        && reqStr(d, 'email', 5, 120)
+        && d.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]{2,}$')
+        && optStr(d, 'firstName', 60)
+        && optStr(d, 'lastName', 60)
+        && optStr(d, 'phone', 30)
+        && optStr(d, 'country', 60)
+        && optStr(d, 'state', 60)
+        && optStr(d, 'message', 2000)
+        && optStr(d, 'referral', 40)
+        && (!('services' in d) || (d.services is list && d.services.size() <= 7
+            && d.services.hasOnly(['universidad', 'carrera', 'equivalencia', 'credito_personal',
+                                   'credito_empresa', 'empresa', 'toolkits'])))
+        && d.language in ['es', 'en']
+        && d.source in ['landing', 'blog-newsletter']
+        && d.status == 'nuevo'
+        && d.consent == true
+        && d.createdAt == request.time;
+    }
+
+    match /leads/{leadId} {
+      allow create: if validLead(request.resource.data);
+      allow read, update: if isStaff();
+      allow delete: if isOwnerRole();
+    }
+
+    // ---------- Contenido público ----------
+    match /testimonials/{id} {
+      allow read: if resource.data.published == true || isAdmin();
+      allow write: if isEditor();
+    }
+
+    match /siteMedia/{espacioId} {
+      allow read: if true;
+      allow write: if isEditor();
+
+      match /items/{itemId} {
+        allow read: if true;
+        allow write: if isEditor();
+      }
+    }
+
+    match /postCategories/{id} {
+      allow read: if true;
+      allow write: if isEditor();
+    }
+
+    // ---------- Blog ----------
+    match /posts/{postId} {
+      // Público: publicados, ya en fecha y visibles para todos.
+      // Usuarios registrados: además los "solo miembros".
+      allow read: if isEditor()
+        || (resource.data.status == 'publicado'
+            && resource.data.publishAt <= request.time
+            && (resource.data.visibility == 'publico'
+                || (signedIn() && resource.data.visibility == 'miembros')));
+
+      // Contador de lecturas: cualquiera suma exactamente 1 y no toca nada más
+      allow update: if isEditor()
+        || (resource.data.status == 'publicado'
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views'])
+            && request.resource.data.views == resource.data.get('views', 0) + 1);
+
+      allow create, delete: if isEditor();
+
+      match /versions/{versionId} {
+        allow read, write: if isEditor();
+      }
+    }
+
+    // ---------- Registro de actividad ----------
+    match /auditLog/{id} {
+      allow read: if isOwnerRole();
+      allow create: if isAdmin() && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
+    }
+  }
+}
