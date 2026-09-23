@@ -80,7 +80,8 @@ function iniciarNavegacion() {
       });
     });
   }, { rootMargin: '-45% 0px -50% 0px' });
-  ['historia', 'metodo', 'servicios', 'contacto'].forEach((id) => { const s = document.getElementById(id); if (s) observador.observe(s); });
+  // Se observan todas las secciones para limpiar el enlace activo en las que no tienen enlace
+  ['inicio', 'historia', 'metodo', 'servicios', 'reconocimientos', 'testimonios', 'comunidad', 'blog', 'contacto'].forEach((id) => { const s = document.getElementById(id); if (s) observador.observe(s); });
 }
 
 /* ==========================================================================

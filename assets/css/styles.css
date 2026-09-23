@@ -1688,3 +1688,60 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 @media (max-width: 420px) { .nav-simple .marca-texto { display: none; } }
 /* La cabecera de páginas simples siempre deja espacio a la navegación fija */
 .seccion-oscura.cabecera-simple { padding-top: calc(var(--nav-alto) + clamp(40px, 7vw, 70px) + env(safe-area-inset-top)); }
+
+/* ==========================================================================
+   26. Pulido visual: ritmo vino / claro en la landing
+   ========================================================================== */
+/* Contacto sobre vino: textos claros y formulario en un panel marfil */
+.contacto.seccion-oscura .pasos-contacto .paso-icono { background: rgba(255, 252, 250, .08); border-color: rgba(246, 220, 185, .3); }
+.contacto.seccion-oscura .pasos-contacto svg { stroke: var(--oro-medio); }
+.contacto.seccion-oscura .pasos-contacto strong { color: var(--oro-claro); }
+.contacto.seccion-oscura .pasos-contacto span { color: rgba(246, 220, 185, .78); }
+.contacto.seccion-oscura .contacto-directo a { color: var(--oro-claro); }
+.contacto.seccion-oscura .contacto-directo svg { stroke: var(--oro-medio); }
+.contacto.seccion-oscura .aviso-legal-corto { color: rgba(246, 220, 185, .66); }
+.contacto.seccion-oscura .formulario-marco {
+  background: rgba(255, 252, 250, .97);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  color: var(--tinta);
+  box-shadow: 0 40px 80px -40px rgba(20, 4, 10, .75);
+}
+.contacto.seccion-oscura .formulario-marco :focus-visible { outline-color: var(--vino); box-shadow: 0 0 0 5px rgba(211, 174, 122, .45); }
+
+/* El pie se separa del contacto con un filo dorado */
+.pie::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: min(1120px, calc(100% - 32px));
+  height: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, transparent, rgba(211, 174, 122, .6), transparent);
+}
+
+/* Cifras de "Mi historia" alineadas por arriba aunque el texto ocupe dos líneas */
+.cifras { align-items: start; }
+/* La comilla decorativa nunca tapa el texto del testimonio */
+.testimonio blockquote p { padding-right: 38px; }
+/* Servicios en celular: tarjetas compactas con el icono junto al título */
+@media (max-width: 640px) {
+  .rejilla-servicios { gap: 12px; }
+  .servicio { display: grid; grid-template-columns: 40px 1fr; column-gap: 14px; align-items: start; padding: 20px 18px; }
+  .servicio .icono-linea { grid-row: 1 / span 3; width: 36px; height: 36px; margin-top: 2px; }
+  .servicio h3 { margin-top: 0; font-size: 1.08rem; }
+  .servicio p { margin-top: 6px; font-size: .92rem; }
+  .servicio .enlace-servicio { justify-self: start; margin-top: 10px; }
+}
+/* Blog de la landing en celular: recientes en formato fila compacta */
+@media (max-width: 899px) {
+  .blog-rejilla { gap: 14px; }
+  .blog-rejilla > .tarjeta-post:not(.destacada) { flex-direction: row; }
+  .blog-rejilla > .tarjeta-post:not(.destacada) .portada { flex: 0 0 34%; aspect-ratio: auto; min-height: 118px; }
+  .blog-rejilla > .tarjeta-post:not(.destacada) .marcador-marca { display: none; }
+  .blog-rejilla > .tarjeta-post:not(.destacada) .marcador::after { inset: 8px; }
+  .blog-rejilla > .tarjeta-post:not(.destacada) .tarjeta-post-cuerpo { padding: 14px 16px; gap: 6px; }
+  .blog-rejilla > .tarjeta-post:not(.destacada) h3 { font-size: 1.02rem; }
+  .blog-rejilla > .tarjeta-post:not(.destacada) .tarjeta-post-meta { font-size: .78rem; gap: 2px 10px; }
+}
