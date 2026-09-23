@@ -218,3 +218,108 @@ export function enlaceWhatsApp(mensaje = '') {
   const numero = String(CONFIG.contacto.whatsapp).replace(/\D/g, '');
   return `https://wa.me/${numero}${mensaje ? `?text=${encodeURIComponent(mensaje)}` : ''}`;
 }
+
+/* ==========================================================================
+   Cloudinary: subida sin firma con progreso (XMLHttpRequest)
+   ========================================================================== */
+export const TIPOS_DOCUMENTO = {
+  'application/pdf': 'pdf',
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+};
+
+export function cloudinaryConfigurado() {
+  const { cloudName, uploadPreset } = CONFIG.cloudinary;
+  return !/(TU_|PENDIENTE)/.test(cloudName + uploadPreset);
+}
+
+/**
+ * Sube un archivo a Cloudinary.
+ * @param {File|Blob} archivo
+ * @param {{carpeta?: string, onProgreso?: (p: number) => void, tipo?: 'auto'|'image'|'raw'}} opciones
+ * @returns {Promise<{url: string, publicId: string, width?: number, height?: number, format: string, bytes: number, resourceType: string}>}
+ */
+export function subirACloudinary(archivo, { carpeta = '', onProgreso, tipo = 'auto' } = {}) {
+  const { cloudName, uploadPreset, carpetaBase } = CONFIG.cloudinary;
+  return new Promise((resolver, rechazar) => {
+    const datos = new FormData();
+    datos.append('file', archivo);
+    datos.append('upload_preset', uploadPreset);
+    datos.append('folder', [carpetaBase, carpeta].filter(Boolean).join('/'));
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `https://api.cloudinary.com/v1_1/${cloudName}/${tipo}/upload`);
+    xhr.upload.addEventListener('progress', (e) => {
+      if (e.lengthComputable && onProgreso) onProgreso(Math.round((e.loaded / e.total) * 100));
+    });
+    xhr.addEventListener('load', () => {
+      let r = {};
+      try { r = JSON.parse(xhr.responseText); } catch { /* respuesta vacía */ }
+      if (xhr.status >= 200 && xhr.status < 300 && r.secure_url) {
+        resolver({
+          url: r.secure_url,
+          publicId: r.public_id,
+          width: r.width,
+          height: r.height,
+          format: r.format || String(r.public_id || '').split('.').pop(),
+          bytes: r.bytes,
+          resourceType: r.resource_type,
+        });
+      } else {
+        rechazar(new Error(r.error?.message || `Cloudinary respondió ${xhr.status}`));
+      }
+    });
+    xhr.addEventListener('error', () => rechazar(new Error('network')));
+    xhr.send(datos);
+  });
+}
+
+/* Tamaño legible (KB / MB) */
+export function tamanoLegible(bytes = 0) {
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+/* Fecha local AAAA-MM-DD (para rachas y fechas límite) */
+export function fechaLocal(fecha = new Date()) {
+  const d = new Date(fecha);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/* HTML de un iframe para videos de YouTube o Vimeo; cadena vacía si la URL no es válida */
+export function embedVideo(url, titulo = '') {
+  if (!url) return '';
+  let src = '';
+  const yt = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{6,})/);
+  const vimeo = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+  if (yt) src = `https://www.youtube-nocookie.com/embed/${yt[1]}?rel=0`;
+  else if (vimeo) src = `https://player.vimeo.com/video/${vimeo[1]}`;
+  if (!src) return '';
+  return `<div class="video"><iframe src="${src}" title="${escaparHTML(titulo)}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`;
+}
+
+/* DOMPurify bajo demanda para contenido con formato */
+let promesaPurify = null;
+export async function sanearHTML(html = '') {
+  promesaPurify ??= import('https://cdn.jsdelivr.net/npm/dompurify@3.1.6/+esm').then((m) => m.default).catch(() => null);
+  const purify = await promesaPurify;
+  if (!purify) return escaparHTML(String(html).replace(/<[^>]+>/g, ' '));
+  return purify.sanitize(html, {
+    FORBID_TAGS: ['style', 'form', 'input', 'button', 'textarea', 'select'],
+    ALLOWED_URI_REGEXP: /^(?:https?:|mailto:|tel:|#)/i,
+    ADD_ATTR: ['target', 'rel'],
+  });
+}
+
+/* Confeti dorado discreto (respeta "reducir movimiento") */
+let promesaConfeti = null;
+export async function confetiDorado() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  promesaConfeti ??= import('https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/+esm').then((m) => m.default).catch(() => null);
+  const confeti = await promesaConfeti;
+  if (!confeti) return;
+  const colores = ['#D3AE7A', '#E4C692', '#F6DCB9', '#C99F66', '#7A2A45'];
+  confeti({ particleCount: 90, spread: 70, startVelocity: 38, origin: { y: 0.65 }, colors: colores, zIndex: 400 });
+  setTimeout(() => confeti({ particleCount: 60, spread: 100, origin: { y: 0.55 }, colors: colores, zIndex: 400 }), 250);
+}

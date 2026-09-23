@@ -12,6 +12,13 @@ import {
   pintarMarcadores, aplicarMedios, leerCacheMedios, leerMediosFirestore, enlaceWhatsApp,
 } from './util.js';
 import { iniciarI18n, t, cambiarIdioma } from './i18n.js';
+import {
+  iniciarCursos, cargarCursos, detenerCursos, pintarRuta, abrirCurso, repintarCursos,
+  progresoPorEtapa, continuarDondeLoDejaste, primerCursoRecomendado, hayCursos, tituloCurso, tituloLeccion,
+} from './portal-cursos.js';
+import { iniciarTareas, cargarTareas, detenerTareas, pintarPlan, tareasPendientes, itemTarea } from './portal-tareas.js';
+import { iniciarDocumentos, escucharDocumentos, detenerDocumentos, pintarDocumentos } from './portal-documentos.js';
+import { iniciarChat, escucharChat, detenerChat, alMostrarMensajes, pintarMensajes, ultimosMensajes, noLeidos } from './portal-chat.js';
 
 document.documentElement.classList.add('js');
 let idioma = iniciarI18n();
@@ -25,13 +32,22 @@ let anuncios = [];
 let medios = { medios: {}, galerias: {} };
 let perfilSucio = false;
 
-const VISTAS = ['inicio', 'ruta', 'plan', 'documentos', 'mensajes', 'articulos', 'comunidad', 'perfil'];
+const VISTAS = ['inicio', 'ruta', 'curso', 'plan', 'documentos', 'mensajes', 'articulos', 'comunidad', 'perfil'];
 const REGEX_CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const REGEX_TELEFONO = /^\+?[\d\s().-]{7,30}$/;
 const SITUACIONES = ['estudiante', 'padre', 'profesional', 'emprendedor', 'otro'];
 
-/* Progreso por etapa: se alimenta con los cursos en la Fase 3 */
-let progresoEtapas = { 1: 0, 2: 0, 3: 0, 4: 0 };
+/* Contexto compartido con los módulos del portal */
+const ctx = {
+  get fb() { return fb; },
+  get usuario() { return usuario; },
+  get perfil() { return perfil; },
+  get idioma() { return idioma; },
+  actualizarPerfilLocal(cambios) { if (perfil) Object.assign(perfil, cambios); },
+  alCambiarProgreso() { pintarInicio(); pintarRuta(); },
+  alCambiarMensajes() { pintarContadorMensajes(); if (vistaDesdeHash() === 'inicio') pintarInicio(); },
+  enlaceAgenda: () => enlaceAgenda(),
+};
 
 const ICONOS = {
   racha: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c1 3 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-3-1-5 1-8.5Z"/></svg>',
@@ -462,23 +478,32 @@ function abrirLateral(abrir) {
   if (abrir) $('#lateral-nav a[aria-current="page"]')?.focus();
 }
 
+function partesHash() {
+  return location.hash.replace('#', '').split('?')[0].split('/').map((p) => decodeURIComponent(p));
+}
 function vistaDesdeHash() {
-  const nombre = location.hash.replace('#', '').split('?')[0];
+  const nombre = partesHash()[0];
   return VISTAS.includes(nombre) ? nombre : 'inicio';
 }
 
 function navegar(vista, { enfocar = true } = {}) {
   VISTAS.forEach((v) => { const s = document.getElementById(`vista-${v}`); if (s) s.hidden = v !== vista; });
+  const menu = vista === 'curso' ? 'ruta' : vista;
   $$('#lateral-nav a').forEach((a) => {
-    if (a.dataset.vista === vista) a.setAttribute('aria-current', 'page');
+    if (a.dataset.vista === menu) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');
   });
   const titulo = $('#titulo-vista');
-  titulo.dataset.i18n = `menu.${vista}`;
+  titulo.dataset.i18n = `menu.${menu}`;
   titulo.textContent = t(titulo.dataset.i18n);
-  document.title = `${t(`menu.${vista}`)} | Success by Karely`;
+  document.title = `${t(`menu.${menu}`)} | Success by Karely`;
   abrirLateral(false);
   if (vista === 'ruta') pintarRuta();
+  if (vista === 'curso') { const [, cursoId, leccionId] = partesHash(); abrirCurso(cursoId, leccionId); }
+  if (vista === 'plan') pintarPlan();
+  if (vista === 'documentos') pintarDocumentos();
+  alMostrarMensajes(vista === 'mensajes');
+  pintarContadorMensajes();
   if (enfocar) { window.scrollTo(0, 0); titulo.focus({ preventScroll: true }); }
 }
 
@@ -527,11 +552,19 @@ function iniciarApp() {
 
   iniciarPerfil();
   iniciarOnboarding();
+  iniciarCursos(ctx);
+  iniciarTareas(ctx);
+  iniciarDocumentos(ctx);
+  iniciarChat(ctx);
 }
 
 async function salir() {
   if (perfilSucio && !window.confirm(t('perfil.salirCambios'))) return;
   perfilSucio = false;
+  detenerChat();
+  detenerDocumentos();
+  detenerCursos();
+  detenerTareas();
   await fb?.fa.signOut(fb.auth);
   history.replaceState(null, '', location.pathname);
 }
@@ -547,6 +580,23 @@ function mostrarApp() {
   pintarComunidad();
   navegar(vistaDesdeHash(), { enfocar: false });
   cargarAnuncios();
+  escucharChat();
+  escucharDocumentos();
+  Promise.all([cargarCursos(), cargarTareas()]).then(() => {
+    pintarInicio();
+    pintarRuta();
+    pintarPlan();
+    if (vistaDesdeHash() === 'curso') { const [, c, l] = partesHash(); abrirCurso(c, l); }
+  });
+}
+
+function pintarContadorMensajes() {
+  const n = noLeidos();
+  const contador = $('#contador-mensajes');
+  if (!contador) return;
+  contador.hidden = !n || vistaDesdeHash() === 'mensajes';
+  contador.textContent = n > 9 ? '9+' : String(n);
+  contador.setAttribute('aria-label', t('chat.noLeidos', { n }));
 }
 
 function pintarLateral() {
@@ -600,10 +650,13 @@ function pintarInicio() {
   if (!perfil) return;
   $('#saludo-titulo').textContent = saludo();
   const foco = perfil.focusStage || null;
-  const global = Math.round(Object.values(progresoEtapas).reduce((a, b) => a + b, 0) / 4);
+  const progresoEtapas = progresoPorEtapa();
+  const global = progresoEtapas.global;
   const racha = Number(perfil.streak) || 0;
   const agenda = enlaceAgenda();
   const externo = !agenda.startsWith('../');
+  const pendientes = tareasPendientes();
+  const mensajes = ultimosMensajes(2);
 
   const anunciosHTML = anuncios.length
     ? `<ul class="lista-anuncios">${anuncios.slice(0, 3).map(itemAnuncio).join('')}</ul>`
@@ -632,11 +685,7 @@ function pintarInicio() {
       <div class="racha-dias" aria-hidden="true">${Array.from({ length: 7 }, (_, i) => `<span class="${i < Math.min(racha, 7) ? 'activo' : ''}"></span>`).join('')}</div>
     </article>
 
-    <article class="panel tarjeta-accion tarjeta-destacada">
-      <div class="tarjeta-cabecera"><span class="tarjeta-icono">${ICONOS.ruta}</span><h3>${escaparHTML(t('ini.empezar'))}</h3></div>
-      <p>${escaparHTML(t('ini.empezarD'))}</p>
-      <div class="acciones"><a class="btn btn-principal btn-sm" href="#ruta">${escaparHTML(t('ini.irRuta'))}</a></div>
-    </article>
+    ${tarjetaContinuar()}
 
     <article class="panel tarjeta-accion">
       <div class="tarjeta-cabecera"><span class="tarjeta-icono">${ICONOS.paso}</span><h3>${escaparHTML(t('ini.proximo'))}</h3></div>
@@ -649,12 +698,17 @@ function pintarInicio() {
 
     <article class="panel">
       <div class="tarjeta-cabecera"><span class="tarjeta-icono">${ICONOS.tareas}</span><h3>${escaparHTML(t('ini.tareas'))}</h3></div>
-      <p class="lista-vacia">${escaparHTML(t('ini.tareasVacio'))}</p>
+      ${pendientes.length
+        ? `<ul class="lista-tareas compacta">${pendientes.slice(0, 3).map((x) => itemTarea(x, true)).join('')}</ul><a class="enlace-app" href="#plan">${escaparHTML(t('ini.verPlan'))}</a>`
+        : `<p class="lista-vacia">${escaparHTML(t('ini.tareasVacio'))}</p>`}
     </article>
 
     <article class="panel">
-      <div class="tarjeta-cabecera"><span class="tarjeta-icono">${ICONOS.mensajes}</span><h3>${escaparHTML(t('ini.mensajes'))}</h3></div>
-      <p class="lista-vacia">${escaparHTML(t('ini.mensajesVacio'))}</p>
+      <div class="tarjeta-cabecera"><span class="tarjeta-icono">${ICONOS.mensajes}</span><h3>${escaparHTML(t('ini.mensajes'))}</h3>${noLeidos() ? `<span class="contador contador-tarjeta">${noLeidos()}</span>` : ''}</div>
+      ${mensajes.length
+        ? `<ul class="mini-mensajes">${mensajes.map((m) => `<li class="${m.from === 'client' ? 'mia' : ''}"><strong>${escaparHTML(m.from === 'client' ? t('chat.tu') : (m.authorName || t('chat.titulo')))}</strong><span>${escaparHTML(m.text)}</span></li>`).join('')}</ul>`
+        : `<p class="lista-vacia">${escaparHTML(t('ini.mensajesVacio2'))}</p>`}
+      <a class="enlace-app" href="#mensajes">${escaparHTML(t('ini.abrirChat'))}</a>
     </article>
 
     <article class="panel">
@@ -664,10 +718,26 @@ function pintarInicio() {
   animarAnillos($('#rejilla-inicio'));
 }
 
-function pintarRuta() {
-  const foco = perfil?.focusStage;
-  const etapa = ETAPAS.find((e) => e.n === foco);
-  $('#ruta-etapa').textContent = etapa ? t('vac.rutaEtapa', { n: etapa.n, etapa: etapa[idioma] }) : '';
+/* Tarjeta "Continúa donde lo dejaste" / "Empieza tu ruta" */
+function tarjetaContinuar() {
+  const seguir = continuarDondeLoDejaste();
+  if (seguir) {
+    const href = `#curso/${encodeURIComponent(seguir.curso.id)}/${encodeURIComponent(seguir.leccion.id)}`;
+    return `
+    <article class="panel tarjeta-accion tarjeta-destacada">
+      <div class="tarjeta-cabecera"><span class="tarjeta-icono">${ICONOS.ruta}</span><h3>${escaparHTML(t('ini.continuar'))}</h3></div>
+      <p><strong>${escaparHTML(tituloCurso(seguir.curso))}</strong><br>${escaparHTML(tituloLeccion(seguir.leccion))}</p>
+      <div class="acciones"><a class="btn btn-principal btn-sm" href="${href}">${escaparHTML(t('ini.continuarBtn'))}</a></div>
+    </article>`;
+  }
+  const recomendado = primerCursoRecomendado();
+  const href = recomendado ? `#curso/${encodeURIComponent(recomendado.id)}` : '#ruta';
+  return `
+    <article class="panel tarjeta-accion tarjeta-destacada">
+      <div class="tarjeta-cabecera"><span class="tarjeta-icono">${ICONOS.ruta}</span><h3>${escaparHTML(t('ini.empezar'))}</h3></div>
+      <p>${recomendado ? `<strong>${escaparHTML(tituloCurso(recomendado))}</strong><br>` : ''}${escaparHTML(t(hayCursos() ? 'ini.empezarD' : 'vac.rutaD'))}</p>
+      <div class="acciones"><a class="btn btn-principal btn-sm" href="${href}">${escaparHTML(t(recomendado ? 'ruta.empezar' : 'ini.irRuta'))}</a></div>
+    </article>`;
 }
 
 /* ---------- Anuncios ---------- */
@@ -932,6 +1002,7 @@ async function alCambiarSesion(user) {
   if (registrando) return; // el flujo de registro se encarga
   usuario = user;
   if (!user) {
+    detenerChat(); detenerDocumentos(); detenerCursos(); detenerTareas();
     perfil = null;
     botonOcupado($('#btn-entrar'), false);
     $('#e-contrasena').value = '';
@@ -1007,7 +1078,11 @@ document.addEventListener('idioma', (e) => {
   if (perfil) {
     pintarInicio();
     pintarComunidad();
-    pintarRuta();
+    repintarCursos();
+    pintarPlan();
+    pintarDocumentos();
+    pintarMensajes();
+    pintarContadorMensajes();
     pintarAvisoVerificacion();
     if (!perfilSucio) pintarPerfil(); // no pisar cambios sin guardar
     navegar(vistaDesdeHash(), { enfocar: false });

@@ -255,7 +255,7 @@
         <a href="#ruta" data-vista="ruta"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h6a3 3 0 0 0 0-6h-4a3 3 0 0 1 0-6h6"/></svg><span data-i18n="menu.ruta">Mi ruta</span></a>
         <a href="#plan" data-vista="plan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 6 1.5 1.5L8 5M4 12l1.5 1.5L8 11M4 18l1.5 1.5L8 17M11 6h9M11 12h9M11 18h9"/></svg><span data-i18n="menu.plan">Plan de acción</span></a>
         <a href="#documentos" data-vista="documentos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg><span data-i18n="menu.documentos">Documentos</span></a>
-        <a href="#mensajes" data-vista="mensajes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg><span data-i18n="menu.mensajes">Mensajes</span></a>
+        <a href="#mensajes" data-vista="mensajes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg><span data-i18n="menu.mensajes">Mensajes</span><span class="contador" id="contador-mensajes" hidden></span></a>
         <a href="#articulos" data-vista="articulos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h5v17H6a2 2 0 0 0-2 1z"/><path d="M20 5a2 2 0 0 0-2-2h-5v17h5a2 2 0 0 1 2 1z"/></svg><span data-i18n="menu.articulos">Artículos exclusivos</span></a>
         <a href="#comunidad" data-vista="comunidad"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14a5 5 0 0 1 5 5"/></svg><span data-i18n="menu.comunidad">Comunidad</span></a>
         <a href="#perfil" data-vista="perfil"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span data-i18n="menu.perfil">Mi perfil</span></a>
@@ -320,41 +320,92 @@
           </div>
         </section>
 
-        <!-- Mi ruta -->
+        <!-- Mi ruta (cursos) -->
         <section class="vista" id="vista-ruta" data-vista="ruta" hidden>
-          <div class="estado-vacio-app panel">
-            <span class="vacio-icono" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h6a3 3 0 0 0 0-6h-4a3 3 0 0 1 0-6h6"/></svg></span>
-            <h2 data-i18n="vac.rutaT">Tu ruta está en preparación</h2>
-            <p id="ruta-etapa" class="vacio-destacado"></p>
-            <p data-i18n="vac.rutaD">Estoy preparando tus cursos. Muy pronto verás aquí cada etapa, lección por lección.</p>
+          <div class="cabecera-vista">
+            <h2 data-i18n="ruta.titulo">Tu ruta, paso a paso</h2>
+            <p data-i18n="ruta.sub">Cursos cortos y prácticos para cada etapa. Tu avance se guarda solo.</p>
+          </div>
+          <div class="filtros" id="filtros-ruta" role="group" data-i18n-attr="aria-label:ruta.filtrar" aria-label="Filtrar por etapa"></div>
+          <div class="rejilla-cursos" id="rejilla-cursos">
+            <div class="esqueleto-app"></div><div class="esqueleto-app"></div><div class="esqueleto-app"></div>
+          </div>
+        </section>
+
+        <!-- Visor de curso -->
+        <section class="vista" id="vista-curso" data-vista="curso" hidden>
+          <a class="volver" href="#ruta"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg><span data-i18n="ruta.volver">Volver a mi ruta</span></a>
+          <header class="curso-cabecera">
+            <p class="curso-etapa" id="curso-etapa"></p>
+            <h2 id="curso-titulo"></h2>
+            <div class="barra-progreso" aria-hidden="true"><span id="curso-barra"></span></div>
+            <p class="texto-suave-app" id="curso-progreso-texto"></p>
+          </header>
+          <div class="curso-layout">
+            <aside class="panel curso-lecciones">
+              <details id="detalles-lecciones" open>
+                <summary><span data-i18n="curso.lecciones">Lecciones</span> <span id="curso-conteo"></span></summary>
+                <ol class="lista-lecciones" id="lista-lecciones"></ol>
+              </details>
+            </aside>
+            <article class="panel leccion" id="leccion" aria-live="polite"></article>
           </div>
         </section>
 
         <!-- Plan de acción -->
         <section class="vista" id="vista-plan" data-vista="plan" hidden>
-          <div class="estado-vacio-app panel">
-            <span class="vacio-icono" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 6 1.5 1.5L8 5M4 12l1.5 1.5L8 11M4 18l1.5 1.5L8 17M11 6h9M11 12h9M11 18h9"/></svg></span>
-            <h2 data-i18n="vac.planT">Aún no tienes tareas</h2>
-            <p data-i18n="vac.planD">Cuando tengamos tu primera consulta, tu plan de acción con fechas aparecerá aquí.</p>
-            <a class="btn btn-principal" href="../#contacto" data-i18n="ini.agendar">Agendar una consulta</a>
+          <div class="cabecera-vista">
+            <h2 data-i18n="plan.titulo">Tu plan de acción</h2>
+            <p data-i18n="plan.sub">Las tareas que definimos para avanzar, con sus fechas. Márcalas cuando las termines.</p>
           </div>
+          <div id="lista-tareas"></div>
         </section>
 
         <!-- Documentos -->
         <section class="vista" id="vista-documentos" data-vista="documentos" hidden>
-          <div class="estado-vacio-app panel">
-            <span class="vacio-icono" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg></span>
-            <h2 data-i18n="vac.docsT">Aún no tienes documentos</h2>
-            <p data-i18n="vac.docsD">Muy pronto podrás subir aquí tu diploma y tus papeles para empezar tu equivalencia.</p>
+          <div class="cabecera-vista">
+            <h2 data-i18n="docs.titulo">Tus documentos</h2>
+            <p data-i18n="docs.sub">Sube aquí tus diplomas, notas y papeles. Mi equipo los revisa y te deja comentarios.</p>
+          </div>
+          <p class="aviso-seguridad" role="note">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6Z"/><path d="M12 8v5M12 16h.01"/></svg>
+            <span data-i18n="docs.aviso">Por tu seguridad, nunca subas tu número de Seguro Social completo ni datos bancarios. Cúbrelos antes de subir el documento.</span>
+          </p>
+          <label class="zona-subida" id="zona-subida">
+            <input type="file" id="archivo-doc" accept=".pdf,.jpg,.jpeg,.png,.webp,.docx,application/pdf,image/jpeg,image/png,image/webp,application/vnd.openxmlformats-officedocument.wordprocessingml.document" multiple>
+            <span class="zona-icono" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg></span>
+            <strong><span data-i18n="docs.soltar">Arrastra tu archivo aquí o</span> <u data-i18n="docs.elegir">elige un archivo</u></strong>
+            <span class="texto-suave-app" data-i18n="docs.formatos">PDF, JPG, PNG, WEBP o DOCX · máximo 10 MB</span>
+          </label>
+          <ul class="subidas" id="subidas" aria-live="polite"></ul>
+          <div class="panel bloque-docs">
+            <h3 data-i18n="docs.mios">Mis documentos</h3>
+            <ul class="lista-docs" id="docs-cliente"></ul>
+          </div>
+          <div class="panel bloque-docs">
+            <h3 data-i18n="docs.equipo">Archivos de mi equipo</h3>
+            <ul class="lista-docs" id="docs-equipo"></ul>
           </div>
         </section>
 
         <!-- Mensajes -->
         <section class="vista" id="vista-mensajes" data-vista="mensajes" hidden>
-          <div class="estado-vacio-app panel">
-            <span class="vacio-icono" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg></span>
-            <h2 data-i18n="vac.msjT">Tu chat conmigo</h2>
-            <p data-i18n="vac.msjD">Muy pronto podrás escribirme directamente desde aquí y recibir respuestas de mi equipo.</p>
+          <div class="chat panel">
+            <header class="chat-cabecera">
+              <span class="chat-avatar" aria-hidden="true"><span class="k-tipografica">K</span></span>
+              <div>
+                <h2 data-i18n="chat.titulo">Karely y equipo</h2>
+                <p class="texto-suave-app" data-i18n="chat.estado">Te responderemos lo antes posible.</p>
+              </div>
+            </header>
+            <div class="chat-mensajes" id="chat-mensajes" role="log" aria-live="polite" tabindex="0"></div>
+            <form class="chat-form" id="chat-form">
+              <label class="solo-lectores" for="chat-texto" data-i18n="chat.placeholder">Escribe tu mensaje…</label>
+              <textarea id="chat-texto" rows="1" maxlength="2000" data-i18n-attr="placeholder:chat.placeholder" placeholder="Escribe tu mensaje…"></textarea>
+              <button type="submit" class="btn-enviar" data-i18n-attr="aria-label:chat.enviar" aria-label="Enviar">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12 20 4l-6 16-3-7Z"/><path d="m11 13 9-9"/></svg>
+              </button>
+            </form>
           </div>
         </section>
 
@@ -538,6 +589,21 @@
           <button type="button" class="btn btn-vidrio" id="onb-atras" hidden><span data-i18n="reg.atras">Atrás</span></button>
           <button type="button" class="btn btn-principal" id="onb-siguiente"><span data-i18n="onb.siguiente">Siguiente</span></button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= CELEBRACIÓN ================= -->
+  <div class="onboarding celebracion" id="celebracion" hidden>
+    <div class="onboarding-velo"></div>
+    <div class="onboarding-panel celebracion-panel glass" role="dialog" aria-modal="true" aria-labelledby="cel-titulo">
+      <span class="onb-k" aria-hidden="true">K</span>
+      <h2 class="onb-titulo" id="cel-titulo" data-i18n="cel.titulo">Un paso más hacia tu futuro</h2>
+      <p class="onb-texto" id="cel-texto"></p>
+      <p class="onb-firma">Karely Paredes</p>
+      <div class="onb-botones cel-botones">
+        <button type="button" class="btn btn-vidrio" id="cel-cerrar"><span data-i18n="cel.cerrar">Seguir aquí</span></button>
+        <a class="btn btn-principal" href="#ruta" id="cel-ruta"><span data-i18n="cel.ruta">Ver mi ruta</span></a>
       </div>
     </div>
   </div>
