@@ -147,8 +147,11 @@ Degradado dorado metálico: `linear-gradient(115deg, #C99F66 0%, #E9CD98 38%, #F
 Monograma: K entrelazada con flor de loto dorada. Wordmark: "SUCCESS" sans geométrica gruesa + "BY" en círculo dorado + "Karely" serif caligráfica de alto contraste. Mientras no se suba el logo, usar un wordmark tipográfico: "Success by Karely" en Fraunces con degradado dorado y una K tipográfica como monograma.
 
 ### 4.3 Tipografía
-- Títulos: Fraunces (300–600), evoca el "Karely" del logo.
-- Texto e interfaz: Outfit (300–600), evoca "SUCCESS".
+- Títulos: Playfair Display (400–700), serif de alto contraste que evoca el "Karely" del logo. *(Actualizado a pedido del cliente: antes Fraunces.)*
+- Texto e interfaz: Plus Jakarta Sans (300–700), sans profesional y legible. *(Actualizado a pedido del cliente: antes Outfit.)*
+- Números siempre alineados (`font-variant-numeric: lining-nums`).
+- Logo oficial en `assets/img/marca/` (monograma y logo completo, PNG/WebP transparentes). Se usa como respaldo en navegación, hero, pie, portal, marcadores, favicon y og-image; siempre sobre fondos vino. Sigue siendo reemplazable desde Admin > Imágenes del sitio.
+- Pantalla de bienvenida (splash) con el logo: una vez por sesión en la landing y en /propuesta; se omite con prefers-reduced-motion.
 - Google Fonts con fallbacks reales. Líneas de máximo ~72 caracteres. Para artículos del blog, escala editorial con más interlineado.
 
 ### 4.4 Imágenes administrables desde el panel

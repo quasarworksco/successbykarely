@@ -4,7 +4,8 @@ rules_version = '2';
 // Success by Karely — Reglas de seguridad de Cloud Firestore
 // Fase 1: funciones de rol, leads (formulario público) y contenido público
 // (testimonios, imágenes del sitio, categorías y artículos del blog).
-// Las colecciones de usuarios, CRM, chats y cursos se agregan en sus fases.
+// Fase 2: perfiles de clientes (users), chat inicial y anuncios.
+// CRM, cursos, documentos y mensajes se agregan en sus fases.
 // Todo lo que no aparece aquí queda DENEGADO.
 // ============================================================================
 service cloud.firestore {
@@ -85,6 +86,80 @@ service cloud.firestore {
       allow create: if validLead(request.resource.data);
       allow read, update: if isStaff();
       allow delete: if isOwnerRole();
+    }
+
+    // ---------- Clientes (users) ----------
+    // Campos que el propio cliente puede escribir en su perfil
+    function camposPerfil() {
+      return ['firstName', 'lastName', 'phone', 'country', 'state', 'city', 'language',
+              'birthDate', 'situation', 'services', 'referral', 'consentMarketing', 'theme',
+              'onboardingDone', 'focusStage', 'streak', 'lastStudyDate', 'lastActiveAt', 'updatedAt'];
+    }
+    function validPerfil(d) {
+      return reqStr(d, 'firstName', 1, 60)
+        && reqStr(d, 'lastName', 1, 60)
+        && reqStr(d, 'phone', 7, 30)
+        && optStr(d, 'country', 60)
+        && optStr(d, 'state', 60)
+        && optStr(d, 'city', 60)
+        && d.language in ['es', 'en']
+        && (!('birthDate' in d) || (d.birthDate is string && (d.birthDate == ''
+            || d.birthDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$'))))
+        && d.situation in ['', 'estudiante', 'padre', 'profesional', 'emprendedor', 'otro']
+        && d.services is list && d.services.size() <= 7
+        && d.services.hasOnly(['universidad', 'carrera', 'equivalencia', 'credito_personal',
+                               'credito_empresa', 'empresa', 'toolkits'])
+        && optStr(d, 'referral', 40)
+        && d.consentMarketing is bool
+        && d.theme in ['claro', 'oscuro', 'sistema']
+        && d.onboardingDone is bool
+        && (!('focusStage' in d) || (d.focusStage is int && d.focusStage >= 1 && d.focusStage <= 4))
+        && d.streak is int && d.streak >= 0 && d.streak <= 5000
+        && optStr(d, 'lastStudyDate', 10);
+    }
+
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isStaff();
+
+      // Alta: solo el propio usuario, con su correo real y fechas del servidor
+      allow create: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(camposPerfil().concat(['email', 'acceptedTermsAt', 'createdAt']))
+        && validPerfil(request.resource.data)
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.onboardingDone == false
+        && request.resource.data.streak == 0
+        && request.resource.data.acceptedTermsAt == request.time
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.lastActiveAt == request.time;
+
+      // Edición del cliente: solo sus campos de perfil (nunca correo ni fechas de alta)
+      allow update: if (isOwner(uid)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(camposPerfil())
+          && validPerfil(request.resource.data)
+          && request.resource.data.updatedAt == request.time)
+        || isStaff();
+
+      allow delete: if isOwnerRole();
+    }
+
+    // ---------- Chats (se crean al registrarse; los mensajes llegan en la Fase 4) ----------
+    match /chats/{uid} {
+      allow read: if isOwner(uid) || isStaff();
+      allow create: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['clientName', 'lastMessage', 'updatedAt', 'unreadByAdmin', 'unreadByClient'])
+        && reqStr(request.resource.data, 'clientName', 1, 130)
+        && request.resource.data.lastMessage == ''
+        && request.resource.data.unreadByAdmin == 0
+        && request.resource.data.unreadByClient == 0
+        && request.resource.data.updatedAt == request.time;
+      allow update: if isStaff();
+    }
+
+    // ---------- Anuncios ----------
+    match /announcements/{id} {
+      allow read: if resource.data.published == true || isAdmin();
+      allow write: if isEditor();
     }
 
     // ---------- Contenido público ----------

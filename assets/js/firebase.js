@@ -22,6 +22,22 @@ async function cargarApp() {
   return promesaApp;
 }
 
+let promesaAuth = null;
+
+/* Devuelve { auth, fa } donde fa son las funciones de Authentication, o null */
+export async function cargarAuth() {
+  if (!firebaseConfigurado) return null;
+  promesaAuth ??= (async () => {
+    const [app, fa] = await Promise.all([cargarApp(), import(`${BASE}/firebase-auth.js`)]);
+    return { auth: fa.getAuth(app), fa };
+  })().catch((error) => {
+    console.error('[firebase] No se pudo cargar Authentication:', error);
+    promesaAuth = null;
+    return null;
+  });
+  return promesaAuth;
+}
+
 /* Devuelve { db, fs } donde fs son las funciones de Firestore, o null en modo demo */
 export async function cargarFirestore() {
   if (!firebaseConfigurado) return null;

@@ -2,5 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /portal/
+Disallow: /propuesta/
 
 Sitemap: https://successbykarely.dgp-link.com/sitemap.xml
