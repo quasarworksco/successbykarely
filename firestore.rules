@@ -1,12 +1,13 @@
 rules_version = '2';
 
 // ============================================================================
-// Success by Karely — Reglas de seguridad de Cloud Firestore
-// Fase 1: funciones de rol, leads (formulario público) y contenido público
-// (testimonios, imágenes del sitio, categorías y artículos del blog).
-// Fase 2: perfiles de clientes (users), chat inicial y anuncios.
-// CRM, cursos, documentos y mensajes se agregan en sus fases.
+// Success by Karely — Reglas de seguridad de Cloud Firestore (versión final)
+// Roles (admins/{uid}.role):
+//   owner  → todo, incluido equipo y registro de actividad
+//   staff  → clientes, CRM, leads, mensajes, documentos y tareas
+//   editor → blog, cursos, imágenes del sitio, testimonios y anuncios
 // Todo lo que no aparece aquí queda DENEGADO.
+// Pruébalas en Firebase > Firestore > Reglas > Simulador (ver README).
 // ============================================================================
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -48,12 +49,25 @@ service cloud.firestore {
     function reqStr(d, campo, min, max) {
       return campo in d && d[campo] is string && d[campo].size() >= min && d[campo].size() <= max;
     }
+    function soloCambian(campos) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(campos);
+    }
+    function serviciosValidos(lista) {
+      return lista is list && lista.size() <= 7
+        && lista.hasOnly(['universidad', 'carrera', 'equivalencia', 'credito_personal',
+                          'credito_empresa', 'empresa', 'toolkits']);
+    }
 
     // ---------- Administradores ----------
     match /admins/{uid} {
-      // Cada admin puede leer su propio documento (para saber su rol); el owner lee todos
+      // Cada admin lee su propio documento (para saber su rol); el owner lee todos
       allow read: if isOwner(uid) || isOwnerRole();
-      allow write: if isOwnerRole();
+      allow create, update: if isOwnerRole()
+        && request.resource.data.role in ['owner', 'staff', 'editor']
+        && reqStr(request.resource.data, 'name', 1, 80)
+        && reqStr(request.resource.data, 'email', 3, 120);
+      // El owner no puede quitarse a sí mismo (evita quedarse sin dueño)
+      allow delete: if isOwnerRole() && request.auth.uid != uid;
     }
 
     // ---------- Leads (formulario de contacto y boletín) ----------
@@ -72,9 +86,7 @@ service cloud.firestore {
         && optStr(d, 'state', 60)
         && optStr(d, 'message', 2000)
         && optStr(d, 'referral', 40)
-        && (!('services' in d) || (d.services is list && d.services.size() <= 7
-            && d.services.hasOnly(['universidad', 'carrera', 'equivalencia', 'credito_personal',
-                                   'credito_empresa', 'empresa', 'toolkits'])))
+        && (!('services' in d) || serviciosValidos(d.services))
         && d.language in ['es', 'en']
         && d.source in ['landing', 'blog-newsletter']
         && d.status == 'nuevo'
@@ -86,6 +98,11 @@ service cloud.firestore {
       allow create: if validLead(request.resource.data);
       allow read, update: if isStaff();
       allow delete: if isOwnerRole();
+
+      match /notes/{noteId} {
+        allow read, create: if isStaff();
+        allow update, delete: if isOwnerRole();
+      }
     }
 
     // ---------- Clientes (users) ----------
@@ -106,9 +123,7 @@ service cloud.firestore {
         && (!('birthDate' in d) || (d.birthDate is string && (d.birthDate == ''
             || d.birthDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$'))))
         && d.situation in ['', 'estudiante', 'padre', 'profesional', 'emprendedor', 'otro']
-        && d.services is list && d.services.size() <= 7
-        && d.services.hasOnly(['universidad', 'carrera', 'equivalencia', 'credito_personal',
-                               'credito_empresa', 'empresa', 'toolkits'])
+        && serviciosValidos(d.services)
         && optStr(d, 'referral', 40)
         && d.consentMarketing is bool
         && d.theme in ['claro', 'oscuro', 'sistema']
@@ -135,15 +150,71 @@ service cloud.firestore {
 
       // Edición del cliente: solo sus campos de perfil (nunca correo ni fechas de alta)
       allow update: if (isOwner(uid)
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(camposPerfil())
+          && soloCambian(camposPerfil())
           && validPerfil(request.resource.data)
           && request.resource.data.updatedAt == request.time)
         || isStaff();
 
       allow delete: if isOwnerRole();
+
+      // Progreso por curso: el cliente solo guarda lecciones completadas y la última vista
+      match /progress/{courseId} {
+        allow read: if isOwner(uid) || isStaff() || isEditor();
+        allow create, update: if (isOwner(uid)
+            && request.resource.data.keys().hasOnly(['completed', 'lastLessonId', 'updatedAt'])
+            && request.resource.data.completed is list
+            && request.resource.data.completed.size() <= 500
+            && reqStr(request.resource.data, 'lastLessonId', 0, 60)
+            && request.resource.data.updatedAt == request.time)
+          || isStaff();
+        allow delete: if isStaff();
+      }
+
+      // Plan de acción: el equipo crea tareas; el cliente solo marca "hecho"
+      match /tasks/{taskId} {
+        allow read: if isOwner(uid) || isStaff();
+        allow update: if (isOwner(uid) && soloCambian(['done']) && request.resource.data.done is bool)
+          || isStaff();
+        allow create, delete: if isStaff()
+          && (request.method == 'delete' || (reqStr(request.resource.data, 'title', 1, 200)
+              && optStr(request.resource.data, 'detail', 2000)));
+      }
+
+      // Documentos: el cliente sube y lee los suyos; nunca cambia estado ni comentario
+      match /documents/{docId} {
+        allow read: if isOwner(uid) || isStaff();
+        allow create: if (isOwner(uid)
+            && request.resource.data.keys().hasOnly(['name', 'url', 'publicId', 'format', 'bytes',
+                                                     'uploadedBy', 'status', 'adminComment', 'createdAt'])
+            && reqStr(request.resource.data, 'name', 1, 160)
+            && reqStr(request.resource.data, 'url', 12, 600)
+            && request.resource.data.url.matches('^https://res\\.cloudinary\\.com/.*')
+            && optStr(request.resource.data, 'publicId', 300)
+            && optStr(request.resource.data, 'format', 10)
+            && request.resource.data.bytes is int
+            && request.resource.data.bytes <= 10485760
+            && request.resource.data.uploadedBy == 'client'
+            && request.resource.data.status == 'recibido'
+            && request.resource.data.adminComment == ''
+            && request.resource.data.createdAt == request.time)
+          || (isStaff() && request.resource.data.uploadedBy == 'admin');
+        allow update: if isStaff()
+          && request.resource.data.status in ['recibido', 'revision', 'aprobado', 'correccion'];
+        allow delete: if isStaff();
+      }
     }
 
-    // ---------- Chats (se crean al registrarse; los mensajes llegan en la Fase 4) ----------
+    // ---------- CRM (etapa, etiquetas, notas internas): nunca visible para el cliente ----------
+    match /crm/{uid} {
+      allow read, write: if isStaff();
+
+      match /notes/{noteId} {
+        allow read, create: if isStaff();
+        allow update, delete: if isOwnerRole();
+      }
+    }
+
+    // ---------- Chats ----------
     match /chats/{uid} {
       allow read: if isOwner(uid) || isStaff();
       allow create: if isOwner(uid)
@@ -153,21 +224,52 @@ service cloud.firestore {
         && request.resource.data.unreadByAdmin == 0
         && request.resource.data.unreadByClient == 0
         && request.resource.data.updatedAt == request.time;
-      allow update: if isStaff();
+      // El cliente: al enviar suma 1 a "sin leer por el equipo"; al leer pone sus no leídos en 0
+      allow update: if isStaff()
+        || (isOwner(uid)
+            && soloCambian(['lastMessage', 'updatedAt', 'unreadByAdmin', 'clientName'])
+            && reqStr(request.resource.data, 'lastMessage', 1, 140)
+            && reqStr(request.resource.data, 'clientName', 1, 130)
+            && request.resource.data.updatedAt == request.time
+            && request.resource.data.unreadByAdmin == resource.data.get('unreadByAdmin', 0) + 1)
+        || (isOwner(uid) && soloCambian(['unreadByClient']) && request.resource.data.unreadByClient == 0);
+
+      // Mensajes: nadie edita ni borra mensajes (ni propios ni ajenos)
+      match /messages/{msgId} {
+        allow read: if isOwner(uid) || isStaff();
+        allow create: if request.resource.data.keys().hasOnly(['text', 'from', 'authorName', 'createdAt'])
+          && reqStr(request.resource.data, 'text', 1, 2000)
+          && reqStr(request.resource.data, 'authorName', 1, 130)
+          && request.resource.data.createdAt == request.time
+          && ((isOwner(uid) && request.resource.data.from == 'client')
+              || (isStaff() && request.resource.data.from == 'admin'));
+        allow update, delete: if false;
+      }
     }
 
-    // ---------- Anuncios ----------
+    // ---------- Cursos ----------
+    match /courses/{courseId} {
+      // Clientes con sesión: cursos publicados para todos o asignados a ellos
+      allow read: if isAdmin()
+        || (signedIn() && resource.data.published == true
+            && (resource.data.access == 'todos' || request.auth.uid in resource.data.allowedUids));
+      allow create, delete: if isEditor();
+      // El editor edita todo; el staff solo asigna clientes desde el CRM
+      allow update: if isEditor() || (isStaff() && soloCambian(['allowedUids', 'updatedAt']));
+    }
+
+    // ---------- Anuncios y testimonios ----------
     match /announcements/{id} {
       allow read: if resource.data.published == true || isAdmin();
       allow write: if isEditor();
     }
 
-    // ---------- Contenido público ----------
     match /testimonials/{id} {
       allow read: if resource.data.published == true || isAdmin();
       allow write: if isEditor();
     }
 
+    // ---------- Imágenes del sitio ----------
     match /siteMedia/{espacioId} {
       allow read: if true;
       allow write: if isEditor();
@@ -178,38 +280,52 @@ service cloud.firestore {
       }
     }
 
+    // ---------- Blog ----------
     match /postCategories/{id} {
       allow read: if true;
       allow write: if isEditor();
     }
 
-    // ---------- Blog ----------
+    // Visible: publicado o programado y ya en fecha (los programados se publican solos)
+    function postVisible(d) {
+      return d.status in ['publicado', 'programado'] && d.publishAt <= request.time;
+    }
+
     match /posts/{postId} {
-      // Público: publicados, ya en fecha y visibles para todos.
-      // Usuarios registrados: además los "solo miembros".
-      allow read: if isEditor()
-        || (resource.data.status == 'publicado'
-            && resource.data.publishAt <= request.time
-            && (resource.data.visibility == 'publico'
-                || (signedIn() && resource.data.visibility == 'miembros')));
+      // Título, portada y extracto son públicos cuando el artículo es visible,
+      // también en los "solo miembros": su cuerpo vive en privado/cuerpo.
+      allow read: if isEditor() || postVisible(resource.data);
 
       // Contador de lecturas: cualquiera suma exactamente 1 y no toca nada más
       allow update: if isEditor()
-        || (resource.data.status == 'publicado'
-            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views'])
+        || (postVisible(resource.data)
+            && soloCambian(['views'])
             && request.resource.data.views == resource.data.get('views', 0) + 1);
 
       allow create, delete: if isEditor();
 
+      // Cuerpo de los artículos "Solo miembros": solo con sesión iniciada
+      match /privado/{docId} {
+        allow read: if isEditor()
+          || (signedIn() && postVisible(get(/databases/$(database)/documents/posts/$(postId)).data));
+        allow write: if isEditor();
+      }
+
+      // Historial de versiones del editor
       match /versions/{versionId} {
         allow read, write: if isEditor();
       }
     }
 
-    // ---------- Registro de actividad ----------
+    // ---------- Registro de actividad (solo se agrega; nunca se edita ni se borra) ----------
     match /auditLog/{id} {
       allow read: if isOwnerRole();
-      allow create: if isAdmin() && request.resource.data.uid == request.auth.uid;
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasOnly(['uid', 'name', 'action', 'collection', 'docId', 'summary', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && reqStr(request.resource.data, 'action', 1, 40)
+        && optStr(request.resource.data, 'summary', 300)
+        && request.resource.data.createdAt == request.time;
       allow update, delete: if false;
     }
   }

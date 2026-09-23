@@ -1,0 +1,9 @@
+# Dependencias y registros (Cloud Functions y scripts del blog)
+node_modules/
+*.log
+.firebase/
+.runtimeconfig.json
+# Nunca subir credenciales
+cuenta-servicio*.json
+service-account*.json
+.env

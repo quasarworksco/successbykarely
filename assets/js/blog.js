@@ -11,9 +11,10 @@ import { CONFIG, esPendiente } from './config.js';
 import { cargarFirestore, cargarAuth } from './firebase.js';
 import {
   $, $$, escaparHTML, campo, toast, formatearFecha, urlCloudinary,
-  pintarMarcadores, aplicarMedios, leerCacheMedios, leerMediosFirestore, sanearHTML,
+  pintarMarcadores, aplicarMedios, leerCacheMedios, leerMediosFirestore, sanearHTML, avisarAppsScript,
 } from './util.js';
 import { iniciarI18n, t } from './i18n.js';
+import { iniciarCookies } from './cookies.js';
 import {
   RAIZ, rutaArticulo, urlCompartir, msFecha, leerCategorias, consultarPublicados, ordenEditorial,
   elegirDestacado, cuerpoArticulo, metaArticulo, nombreCategoria, normalizarEtiqueta, etiquetasHTML, minutosLectura,
@@ -694,6 +695,7 @@ function iniciarBoletin() {
         await fs.addDoc(fs.collection(db, 'leads'), {
           email: correo.toLowerCase(), language: idioma, source: 'blog-newsletter', status: 'nuevo', consent: true, services: [], createdAt: fs.serverTimestamp(),
         });
+        avisarAppsScript('suscriptor', { email: correo.toLowerCase() });
         form.hidden = true;
         const ok = $('.boletin-ok', caja);
         ok.hidden = false;
@@ -714,6 +716,7 @@ iniciarNavegacion();
 pintarComunes();
 iniciarMedios();
 iniciarBoletin();
+iniciarCookies(RAIZ);
 if (pagina === 'listado') iniciarListado();
 if (pagina === 'articulo') iniciarArticulo();
 

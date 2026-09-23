@@ -3,7 +3,7 @@
    chats/{uid} (resumen y no leídos) + chats/{uid}/messages en tiempo real.
    El cliente escribe con from == "client"; nunca edita mensajes.
    ========================================================================== */
-import { $, escaparHTML, toast, formatearFecha, fechaLocal } from './util.js';
+import { $, escaparHTML, toast, formatearFecha, fechaLocal, avisarAppsScript } from './util.js';
 import { t } from './i18n.js';
 
 let ctx = null;
@@ -108,6 +108,7 @@ async function enviar(texto) {
     authorName: nombre,
     createdAt: fs.serverTimestamp(),
   });
+  avisarAppsScript('mensaje', { authorName: nombre, text: limpio });
   await fs.updateDoc(fs.doc(db, 'chats', usuario.uid), {
     lastMessage: limpio.slice(0, 140),
     updatedAt: fs.serverTimestamp(),

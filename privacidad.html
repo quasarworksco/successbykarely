@@ -7,6 +7,8 @@
   <meta name="description" content="Cómo Success by Karely y 6SGS Consultants recopilan, usan y protegen tus datos personales.">
   <meta name="theme-color" content="#3A0E1D">
   <link rel="canonical" href="https://successbykarely.dgp-link.com/privacidad.html">
+  <link rel="alternate" hreflang="es" href="https://successbykarely.dgp-link.com/privacidad.html">
+  <link rel="alternate" hreflang="en" href="https://successbykarely.dgp-link.com/privacidad.html?lang=en">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Success by Karely">
   <meta property="og:title" content="Política de privacidad | Success by Karely">
@@ -19,21 +21,26 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..700;1,400..600&family=Plus+Jakarta+Sans:ital,wght@0,300..700;1,400&display=swap">
   <link rel="stylesheet" href="assets/css/styles.css">
+  <script type="module" src="assets/js/legal.js"></script>
 </head>
 <body>
   <!-- Texto base: revisarlo con un profesional legal antes del lanzamiento. -->
-  <a class="saltar" href="#contenido">Saltar al contenido</a>
+  <a class="saltar" href="#contenido" data-i18n="nav.saltar">Saltar al contenido</a>
   <header class="nav nav-simple flotante">
     <div class="nav-capsula">
-      <a class="marca" href="./" aria-label="Success by Karely, inicio">
+      <a class="marca" href="./" aria-label="Success by Karely">
         <span class="monograma"><span class="k-tipografica" aria-hidden="true">K</span></span>
         <span class="marca-texto">Success <em>by</em> Karely</span>
       </a>
-      <a class="btn btn-vidrio btn-sm" href="./">Volver al inicio</a>
+      <div class="nav-acciones">
+        <button class="btn-idioma" type="button" data-cambiar-idioma aria-label="Ver en inglés">EN</button>
+        <a class="btn btn-vidrio btn-sm" href="./" data-i18n="legal.volver">Volver al inicio</a>
+      </div>
     </div>
   </header>
 
   <main id="contenido">
+  <div data-bloque-idioma="es" lang="es">
     <section class="seccion-oscura cabecera-simple">
       <div class="fondo-vivo activo" aria-hidden="true"><span class="orbe orbe-1"></span><span class="orbe orbe-2"></span></div>
       <div class="contenedor">
@@ -41,7 +48,6 @@
         <p class="intro">Tu confianza es la base de todo lo que hacemos. Aquí te explico qué datos recopilamos, para qué y cómo los protegemos.</p>
       </div>
     </section>
-
     <section class="seccion-clara">
       <div class="contenedor texto-legal">
         <p class="fecha-legal">Última actualización: septiembre de 2026</p>
@@ -52,9 +58,9 @@
         <h2>2. Qué datos recopilamos</h2>
         <ul>
           <li><strong>Formulario de contacto y boletín:</strong> nombre, apellido, correo, teléfono o WhatsApp, país de origen, estado de residencia, servicios de interés, tu mensaje, cómo nos conociste e idioma preferido.</li>
-          <li><strong>Cuenta del portal:</strong> los datos de tu perfil (incluida, si decides darla, tu fecha de nacimiento), tu progreso en los cursos, tus tareas y las preferencias de idioma y tema.</li>
+          <li><strong>Cuenta del portal:</strong> los datos de tu perfil (incluida, si decides darla, tu fecha de nacimiento), tu progreso en los cursos, tus tareas y las preferencias de idioma y tema. Registramos la fecha en que aceptas estos términos y tu consentimiento de comunicaciones.</li>
           <li><strong>Documentos y mensajes:</strong> los archivos que subes voluntariamente y las conversaciones con nuestro equipo.</li>
-          <li><strong>Datos técnicos mínimos:</strong> tu navegador guarda localmente tu idioma y tu tema, y una copia temporal de las imágenes del sitio para que cargue más rápido.</li>
+          <li><strong>Datos técnicos mínimos:</strong> tu navegador guarda localmente tu idioma, tu tema, tu decisión sobre cookies y una copia temporal de las imágenes del sitio para que cargue más rápido. También contamos las lecturas de cada artículo del blog de forma anónima.</li>
         </ul>
         <p class="aviso-destacado"><strong>Importante:</strong> nunca subas tu número de Seguro Social completo ni datos bancarios completos. Si un documento los incluye, cubre esos números antes de subirlo.</p>
 
@@ -62,7 +68,7 @@
         <ul>
           <li>Responder a tu solicitud y darte seguimiento.</li>
           <li>Darte acceso a tu espacio personal, guardar tu progreso y acompañarte en tu plan de acción.</li>
-          <li>Enviarte información sobre nuestros servicios y recursos, solo si diste tu consentimiento. Puedes retirarlo cuando quieras.</li>
+          <li>Enviarte información sobre nuestros servicios, recursos y el boletín del blog, solo si diste tu consentimiento. Puedes retirarlo cuando quieras.</li>
           <li>Mejorar el sitio y proteger la plataforma contra abuso y spam.</li>
         </ul>
         <p>No vendemos ni alquilamos tus datos personales.</p>
@@ -70,39 +76,111 @@
         <h2>4. Con quién los compartimos</h2>
         <p>Usamos proveedores de confianza que procesan datos en nuestro nombre:</p>
         <ul>
-          <li><strong>Google Firebase</strong> (Authentication y Cloud Firestore): cuentas de usuario y base de datos.</li>
-          <li><strong>Cloudinary:</strong> almacenamiento de imágenes y archivos que se suben a la plataforma.</li>
-          <li><strong>Telegram:</strong> avisos internos a nuestro equipo cuando llega una solicitud, un mensaje o un documento. Estos avisos incluyen los datos básicos de la solicitud.</li>
-          <li><strong>Google Fonts:</strong> tipografías del sitio.</li>
+          <li><strong>Google Firebase</strong> (Authentication, Cloud Firestore y Cloud Functions): cuentas de usuario, base de datos y avisos automáticos.</li>
+          <li><strong>Cloudinary:</strong> almacenamiento de imágenes y archivos que se suben a la plataforma. Los enlaces de los archivos son difíciles de adivinar, pero no están protegidos por contraseña: no los compartas.</li>
+          <li><strong>Telegram:</strong> avisos internos a nuestro equipo cuando llega una solicitud, un registro, un mensaje o un documento. Estos avisos incluyen los datos básicos de la solicitud.</li>
+          <li><strong>Google Analytics</strong> (solo si lo aceptas): estadísticas anónimas de uso del sitio.</li>
+          <li><strong>Google Fonts, YouTube y Vimeo:</strong> tipografías y videos incrustados en el blog y los cursos.</li>
         </ul>
         <p>Cada proveedor tiene sus propias políticas de privacidad. Solo compartiremos datos con autoridades cuando la ley lo exija.</p>
 
-        <h2>5. Cuánto tiempo los conservamos</h2>
+        <h2 id="cookies">5. Cookies y almacenamiento local</h2>
+        <p>El sitio funciona sin cookies de publicidad. Usamos almacenamiento local del navegador para recordar tu idioma, tu tema y tu sesión en el portal. Si activamos Google Analytics, verás un aviso y solo se cargará si eliges “Aceptar”; puedes cambiar tu decisión desde “Preferencias de cookies” al pie de esta página o borrando los datos del sitio en tu navegador.</p>
+
+        <h2>6. Cuánto tiempo los conservamos</h2>
         <p>Conservamos tus datos mientras tengas una cuenta activa o mientras sean necesarios para darte servicio, y durante el tiempo que exijan nuestras obligaciones legales. Después los eliminamos o anonimizamos.</p>
 
-        <h2>6. Tus derechos</h2>
+        <h2>7. Tus derechos</h2>
         <p>Puedes pedirnos acceso a tus datos, corregirlos, eliminarlos o retirar tu consentimiento de comunicaciones escribiendo a <strong>PENDIENTE_CORREO</strong>. Desde tu perfil en el portal también puedes actualizar tu información directamente.</p>
 
-        <h2>7. Menores de edad</h2>
+        <h2>8. Menores de edad</h2>
         <p>Nuestros servicios de planificación universitaria pueden involucrar a estudiantes menores de 18 años. En ese caso, la cuenta y los datos deben ser gestionados o autorizados por su padre, madre o tutor legal. No recopilamos a sabiendas datos de menores de 13 años.</p>
 
-        <h2>8. Seguridad</h2>
+        <h2>9. Seguridad</h2>
         <p>Protegemos la información con conexiones cifradas (HTTPS), reglas de acceso que impiden que un usuario vea datos de otro y acceso restringido para nuestro equipo según su rol. Ningún sistema es 100 % infalible, por eso te pedimos no compartir datos más sensibles de lo necesario.</p>
 
-        <h2>9. Cambios a esta política</h2>
+        <h2>10. Cambios a esta política</h2>
         <p>Si hacemos cambios importantes, lo indicaremos en esta página con una nueva fecha de actualización y, cuando corresponda, te avisaremos en el portal.</p>
 
         <p class="aviso-destacado">La información de este sitio es educativa y no constituye asesoría legal, financiera ni migratoria. Success in the USA by 6SGS™ y Engineering Success in the USA™ son marcas de 6SGS Consultants.</p>
       </div>
     </section>
+  </div>
+  <div data-bloque-idioma="en" lang="en" hidden>
+    <section class="seccion-oscura cabecera-simple">
+      <div class="fondo-vivo activo" aria-hidden="true"><span class="orbe orbe-1"></span><span class="orbe orbe-2"></span></div>
+      <div class="contenedor">
+        <h1 class="titulo-seccion">Privacy policy</h1>
+        <p class="intro">Your trust is the foundation of everything we do. Here I explain what data we collect, why, and how we protect it.</p>
+      </div>
+    </section>
+    <section class="seccion-clara">
+      <div class="contenedor texto-legal">
+        <p class="fecha-legal">Last updated: September 2026</p>
+
+        <h2>1. Who we are</h2>
+        <p>Success by Karely is a brand of 6SGS Consultants (6Sigma Global Services Consultants), led by Karely Paredes. In this policy, “we” means Success by Karely and 6SGS Consultants. For any privacy question, write to <strong>PENDIENTE_CORREO</strong>.</p>
+
+        <h2>2. What data we collect</h2>
+        <ul>
+          <li><strong>Contact form and newsletter:</strong> first and last name, email, phone or WhatsApp, country of origin, state of residence, services of interest, your message, how you found us and preferred language.</li>
+          <li><strong>Portal account:</strong> your profile data (including your date of birth, if you choose to share it), course progress, tasks and language and theme preferences. We record the date you accept these terms and your communications consent.</li>
+          <li><strong>Documents and messages:</strong> files you upload voluntarily and your conversations with our team.</li>
+          <li><strong>Minimal technical data:</strong> your browser stores your language, theme, cookie choice and a temporary copy of site images locally so pages load faster. We also count blog article reads anonymously.</li>
+        </ul>
+        <p class="aviso-destacado"><strong>Important:</strong> never upload your full Social Security number or full banking details. If a document includes them, cover those numbers before uploading.</p>
+
+        <h2>3. How we use it</h2>
+        <ul>
+          <li>To answer your request and follow up.</li>
+          <li>To give you access to your personal space, save your progress and support your action plan.</li>
+          <li>To send you information about our services, resources and the blog newsletter, only if you consented. You can withdraw it at any time.</li>
+          <li>To improve the site and protect the platform against abuse and spam.</li>
+        </ul>
+        <p>We do not sell or rent your personal data.</p>
+
+        <h2>4. Who we share it with</h2>
+        <p>We use trusted providers that process data on our behalf:</p>
+        <ul>
+          <li><strong>Google Firebase</strong> (Authentication, Cloud Firestore and Cloud Functions): user accounts, database and automatic notifications.</li>
+          <li><strong>Cloudinary:</strong> storage for images and files uploaded to the platform. File links are hard to guess but not password protected: don’t share them.</li>
+          <li><strong>Telegram:</strong> internal notifications to our team when a request, sign-up, message or document arrives. They include the basic request details.</li>
+          <li><strong>Google Analytics</strong> (only if you accept): anonymous site usage statistics.</li>
+          <li><strong>Google Fonts, YouTube and Vimeo:</strong> fonts and videos embedded in the blog and courses.</li>
+        </ul>
+        <p>Each provider has its own privacy policy. We only share data with authorities when the law requires it.</p>
+
+        <h2 id="cookies-en">5. Cookies and local storage</h2>
+        <p>The site works without advertising cookies. We use the browser’s local storage to remember your language, theme and portal session. If we enable Google Analytics, you will see a notice and it will only load if you choose “Accept”; you can change your choice from “Cookie preferences” at the bottom of this page or by clearing the site data in your browser.</p>
+
+        <h2>6. How long we keep it</h2>
+        <p>We keep your data while you have an active account or while it is needed to serve you, and for as long as our legal obligations require. After that we delete or anonymize it.</p>
+
+        <h2>7. Your rights</h2>
+        <p>You can ask us to access, correct or delete your data, or withdraw your communications consent, by writing to <strong>PENDIENTE_CORREO</strong>. You can also update your information directly from your portal profile.</p>
+
+        <h2>8. Minors</h2>
+        <p>Our college planning services may involve students under 18. In that case, the account and data must be managed or authorized by their parent or legal guardian. We do not knowingly collect data from children under 13.</p>
+
+        <h2>9. Security</h2>
+        <p>We protect information with encrypted connections (HTTPS), access rules that prevent one user from seeing another’s data, and role-based access for our team. No system is 100% infallible, so please don’t share more sensitive data than necessary.</p>
+
+        <h2>10. Changes to this policy</h2>
+        <p>If we make important changes, we will note them on this page with a new update date and, when appropriate, notify you in the portal.</p>
+
+        <p class="aviso-destacado">The information on this site is educational and is not legal, financial or immigration advice. Success in the USA by 6SGS™ and Engineering Success in the USA™ are trademarks of 6SGS Consultants.</p>
+      </div>
+    </section>
+  </div>
   </main>
 
   <footer class="pie">
     <div class="contenedor pie-legal">
       <p class="pie-bajo">
-        <span>© 2026 Success by Karely · 6SGS Consultants</span>
-        <a href="privacidad.html" aria-current="page">Privacidad</a>
-        <a href="terminos.html">Términos</a>
+        <span>© <span data-anio>2026</span> Success by Karely · 6SGS Consultants</span>
+        <a href="privacidad.html" aria-current="page" data-i18n="pie.privacidad">Privacidad</a>
+        <a href="terminos.html" data-i18n="pie.terminos">Términos</a>
+        <a href="#" data-preferencias-cookies hidden data-i18n="legal.cookiesPref">Preferencias de cookies</a>
       </p>
     </div>
   </footer>

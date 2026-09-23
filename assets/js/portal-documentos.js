@@ -6,7 +6,7 @@
 import { CONFIG } from './config.js';
 import {
   $, escaparHTML, toast, formatearFecha, subirACloudinary, cloudinaryConfigurado,
-  TIPOS_DOCUMENTO, tamanoLegible,
+  TIPOS_DOCUMENTO, tamanoLegible, avisarAppsScript,
 } from './util.js';
 import { t } from './i18n.js';
 
@@ -108,6 +108,7 @@ async function subir(archivo) {
       adminComment: '',
       createdAt: fs.serverTimestamp(),
     });
+    avisarAppsScript('documento', { name: archivo.name.slice(0, 160), email: ctx.usuario.email });
     item.classList.add('lista');
     pct.textContent = '✓';
     toast(t('docs.subido'));

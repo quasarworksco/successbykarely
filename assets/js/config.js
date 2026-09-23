@@ -67,6 +67,14 @@ export const CONFIG = {
   // Anti-spam del formulario: segundos mínimos antes de poder enviar
   formulario: { segundosMinimos: 4, esperaEntreEnvios: 60 },
 
+  integraciones: {
+    // Google Analytics 4 (opcional). Ej.: 'G-XXXXXXXXXX'. Solo se carga si la persona acepta cookies.
+    ga4: 'PENDIENTE_GA4',
+    // Alternativa SIN plan Blaze para los avisos de Telegram: URL de la web app de
+    // Google Apps Script (ver README). Déjalo así si usas Cloud Functions.
+    appsScriptTelegram: 'PENDIENTE_APPS_SCRIPT',
+  },
+
   blog: {
     // Artículos por tanda en el listado ("Cargar más")
     porPagina: 9,

@@ -9,7 +9,7 @@ import {
 import { cargarAuth, cargarFirestore } from './firebase.js';
 import {
   $, $$, escaparHTML, toast, formatearFecha, aFecha, campo,
-  pintarMarcadores, aplicarMedios, leerCacheMedios, leerMediosFirestore, enlaceWhatsApp,
+  pintarMarcadores, aplicarMedios, leerCacheMedios, leerMediosFirestore, enlaceWhatsApp, avisarAppsScript,
 } from './util.js';
 import { iniciarI18n, t, cambiarIdioma } from './i18n.js';
 import {
@@ -328,6 +328,7 @@ async function crearPerfil(user, datos) {
     lastActiveAt: ahora,
   };
   await fs.setDoc(fs.doc(db, 'users', user.uid), documento);
+  avisarAppsScript('registro', { firstName: datos.firstName, lastName: datos.lastName, email: user.email, phone: datos.phone, services: datos.services });
   try {
     await fs.setDoc(fs.doc(db, 'chats', user.uid), {
       clientName: `${datos.firstName} ${datos.lastName}`.slice(0, 130),

@@ -10,9 +10,10 @@ import { cargarFirestore, firebaseConfigurado } from './firebase.js';
 import {
   $, $$, escaparHTML, campo, toast, reducirMovimiento, punteroFino, formatearFecha,
   pintarMarcadores, aplicarMedios, leerCacheMedios, leerMediosFirestore,
-  urlCloudinary, srcsetCloudinary, enlaceWhatsApp,
+  urlCloudinary, srcsetCloudinary, enlaceWhatsApp, avisarAppsScript,
 } from './util.js';
 import { iniciarI18n, t } from './i18n.js';
+import { iniciarCookies } from './cookies.js';
 import { leerCategorias, consultarPublicados, elegirDestacado, ordenEditorial, nombreCategoria, rutaArticulo } from './blog-datos.js';
 
 document.documentElement.classList.add('js');
@@ -543,6 +544,7 @@ function iniciarFormulario() {
     try {
       const { db, fs } = firebase;
       await fs.addDoc(fs.collection(db, 'leads'), { ...lead, createdAt: fs.serverTimestamp() });
+      avisarAppsScript('lead', lead);
       try { localStorage.setItem(CLAVE_ULTIMO_ENVIO, String(Date.now())); } catch { /* sin almacenamiento */ }
       mostrarExito(lead.firstName);
       toast(t('form.toastEnviada'));
@@ -585,6 +587,7 @@ iniciarFormulario();
 iniciarMedios();
 iniciarTestimonios();
 iniciarBlog();
+iniciarCookies();
 
 // Al cambiar de idioma se vuelven a pintar las partes dinámicas
 document.addEventListener('idioma', (e) => {

@@ -6,6 +6,7 @@
 import { SERVICIOS, ESPACIOS_IMAGEN } from './config.js';
 import { $, escaparHTML } from './util.js';
 import { t, registrarTextos } from './i18n.js';
+import { estadoEfectivo } from './blog-datos.js';
 import { estado, puede, fs, col, cargarLibreria, ms, icono, campoTexto } from './admin-nucleo.js';
 
 export const ETAPAS_CRM = ['nuevo', 'contactado', 'consulta', 'cliente', 'completado', 'pausa'];
@@ -83,7 +84,7 @@ async function montar(vista) {
     kpis.push(kpi(sinLeer, t('res.sinLeer'), '#mensajes', 'mensajes', sinLeer > 0));
   }
   if (puede.editor()) {
-    kpis.push(kpi(posts.filter((p) => p.status === 'publicado').length, t('res.publicados'), '#blog', 'blog'));
+    kpis.push(kpi(posts.filter((p) => estadoEfectivo(p) === 'publicado').length, t('res.publicados'), '#blog', 'blog'));
   }
 
   vista.innerHTML = `
@@ -118,7 +119,7 @@ async function montar(vista) {
     grafico($('#g-servicios'), servicios.map((s) => s.nombre), servicios.map((s) => s.n), { horizontal: true, nombre: t('res.solicitudes') }).catch(() => {});
   }
   if (puede.editor()) {
-    const top = posts.filter((p) => p.status === 'publicado').sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5);
+    const top = posts.filter((p) => estadoEfectivo(p) === 'publicado').sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5);
     zona.insertAdjacentHTML('beforeend', `
       <section class="panel tarjeta-grafico">
         <h3>${escaparHTML(t('res.masLeidos'))}</h3>

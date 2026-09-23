@@ -1,0 +1,9 @@
+{
+  "name": "successbykarely-scripts",
+  "private": true,
+  "type": "module",
+  "description": "Generador de páginas estáticas del blog (lo ejecuta el GitHub Action)",
+  "dependencies": {
+    "firebase-admin": "^12.6.0"
+  }
+}

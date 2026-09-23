@@ -2,7 +2,7 @@
    Utilidades compartidas: DOM, escape de HTML, fechas, Cloudinary,
    toasts, CSV y medios administrables (siteMedia).
    ========================================================================== */
-import { CONFIG, ESPACIOS_IMAGEN } from './config.js';
+import { CONFIG, ESPACIOS_IMAGEN, esPendiente } from './config.js';
 
 /* ---------- DOM ---------- */
 export const $ = (selector, contexto = document) => contexto.querySelector(selector);
@@ -341,4 +341,14 @@ export async function confetiDorado() {
   const colores = ['#D3AE7A', '#E4C692', '#F6DCB9', '#C99F66', '#7A2A45'];
   confeti({ particleCount: 90, spread: 70, startVelocity: 38, origin: { y: 0.65 }, colors: colores, zIndex: 400 });
   setTimeout(() => confeti({ particleCount: 60, spread: 100, origin: { y: 0.55 }, colors: colores, zIndex: 400 }), 250);
+}
+
+/* Aviso opcional a Telegram vía Google Apps Script (alternativa sin Blaze).
+   No bloquea ni falla: si no está configurado, no hace nada. */
+export function avisarAppsScript(tipo, datos = {}) {
+  const url = CONFIG.integraciones?.appsScriptTelegram;
+  if (esPendiente(url) || !/^https:\/\/script\.google\.com\//.test(url)) return;
+  try {
+    fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ tipo, ...datos }), keepalive: true }).catch(() => {});
+  } catch { /* nunca interrumpe al usuario */ }
 }

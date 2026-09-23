@@ -4,9 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Términos y condiciones | Success by Karely</title>
-  <meta name="description" content="Términos de uso del sitio y del portal de Success by Karely, marca de 6SGS Consultants.">
+  <meta name="description" content="Términos para usar el sitio, el blog y el portal de Success by Karely.">
   <meta name="theme-color" content="#3A0E1D">
   <link rel="canonical" href="https://successbykarely.dgp-link.com/terminos.html">
+  <link rel="alternate" hreflang="es" href="https://successbykarely.dgp-link.com/terminos.html">
+  <link rel="alternate" hreflang="en" href="https://successbykarely.dgp-link.com/terminos.html?lang=en">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Success by Karely">
   <meta property="og:title" content="Términos y condiciones | Success by Karely">
@@ -19,21 +21,26 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..700;1,400..600&family=Plus+Jakarta+Sans:ital,wght@0,300..700;1,400&display=swap">
   <link rel="stylesheet" href="assets/css/styles.css">
+  <script type="module" src="assets/js/legal.js"></script>
 </head>
 <body>
   <!-- Texto base: revisarlo con un profesional legal antes del lanzamiento. -->
-  <a class="saltar" href="#contenido">Saltar al contenido</a>
+  <a class="saltar" href="#contenido" data-i18n="nav.saltar">Saltar al contenido</a>
   <header class="nav nav-simple flotante">
     <div class="nav-capsula">
-      <a class="marca" href="./" aria-label="Success by Karely, inicio">
+      <a class="marca" href="./" aria-label="Success by Karely">
         <span class="monograma"><span class="k-tipografica" aria-hidden="true">K</span></span>
         <span class="marca-texto">Success <em>by</em> Karely</span>
       </a>
-      <a class="btn btn-vidrio btn-sm" href="./">Volver al inicio</a>
+      <div class="nav-acciones">
+        <button class="btn-idioma" type="button" data-cambiar-idioma aria-label="Ver en inglés">EN</button>
+        <a class="btn btn-vidrio btn-sm" href="./" data-i18n="legal.volver">Volver al inicio</a>
+      </div>
     </div>
   </header>
 
   <main id="contenido">
+  <div data-bloque-idioma="es" lang="es">
     <section class="seccion-oscura cabecera-simple">
       <div class="fondo-vivo activo" aria-hidden="true"><span class="orbe orbe-1"></span><span class="orbe orbe-3"></span></div>
       <div class="contenedor">
@@ -41,7 +48,6 @@
         <p class="intro">Las reglas claras hacen que todo funcione mejor. Estos son los términos para usar el sitio y tu espacio personal.</p>
       </div>
     </section>
-
     <section class="seccion-clara">
       <div class="contenedor texto-legal">
         <p class="fecha-legal">Última actualización: septiembre de 2026</p>
@@ -63,36 +69,96 @@
           <li>Podemos suspender cuentas que hagan un uso indebido de la plataforma.</li>
         </ul>
 
-        <h2>5. Uso aceptable</h2>
+        <h2>5. Contenido exclusivo para miembros</h2>
+        <p>Algunos artículos y cursos son solo para personas registradas o para clientes asignados. Son para tu uso personal: no los compartas ni los publiques.</p>
+
+        <h2>6. Uso aceptable</h2>
         <p>No está permitido subir contenido ilegal, ofensivo o que no te pertenezca, intentar acceder a datos de otras personas, ni interferir con el funcionamiento del sitio.</p>
 
-        <h2>6. Propiedad intelectual</h2>
+        <h2>7. Propiedad intelectual</h2>
         <p>Los textos, cursos, materiales, diseño y marcas del sitio pertenecen a 6SGS Consultants o a sus licenciantes. Success in the USA by 6SGS™ y Engineering Success in the USA™ son marcas de 6SGS Consultants. Puedes usar los materiales para tu propio proceso personal, pero no copiarlos, revenderlos ni distribuirlos sin autorización por escrito.</p>
 
-        <h2>7. Servicios de terceros</h2>
-        <p>La plataforma usa Google Firebase, Cloudinary y Telegram, y enlaza a sitios externos como la tienda de toolkits de 6SGS o medios de prensa. No somos responsables del contenido ni de las prácticas de esos sitios.</p>
+        <h2>8. Servicios de terceros</h2>
+        <p>La plataforma usa Google Firebase, Cloudinary y Telegram, y enlaza a sitios externos como la tienda de toolkits de 6SGS, YouTube, Vimeo o medios de prensa. No somos responsables del contenido ni de las prácticas de esos sitios.</p>
 
-        <h2>8. Servicios de pago</h2>
+        <h2>9. Servicios de pago</h2>
         <p>Los servicios personalizados y los toolkits pueden tener un costo. Los precios, alcances y condiciones de cada servicio se acuerdan por escrito antes de empezar.</p>
 
-        <h2>9. Limitación de responsabilidad</h2>
+        <h2>10. Limitación de responsabilidad</h2>
         <p>En la medida en que lo permita la ley, 6SGS Consultants no será responsable por daños indirectos derivados del uso del sitio o de decisiones tomadas con base en su contenido educativo.</p>
 
-        <h2>10. Cambios</h2>
+        <h2>11. Cambios</h2>
         <p>Podemos actualizar estos términos. Publicaremos la nueva versión en esta página con su fecha. Si sigues usando el sitio después de un cambio, aceptas la versión actualizada.</p>
 
-        <h2>11. Contacto</h2>
+        <h2>12. Contacto</h2>
         <p>Si tienes preguntas sobre estos términos, escríbenos a <strong>PENDIENTE_CORREO</strong>.</p>
       </div>
     </section>
+  </div>
+  <div data-bloque-idioma="en" lang="en" hidden>
+    <section class="seccion-oscura cabecera-simple">
+      <div class="fondo-vivo activo" aria-hidden="true"><span class="orbe orbe-1"></span><span class="orbe orbe-3"></span></div>
+      <div class="contenedor">
+        <h1 class="titulo-seccion">Terms and conditions</h1>
+        <p class="intro">Clear rules make everything work better. These are the terms for using the site and your personal space.</p>
+      </div>
+    </section>
+    <section class="seccion-clara">
+      <div class="contenedor texto-legal">
+        <p class="fecha-legal">Last updated: September 2026</p>
+
+        <h2>1. Acceptance</h2>
+        <p>By using this site, creating an account or submitting a form, you accept these terms and our <a href="privacidad.html?lang=en">privacy policy</a>. We record the date you accept them when you create your account.</p>
+
+        <h2>2. Educational nature</h2>
+        <p class="aviso-destacado"><strong>The information on this site, blog, courses and portal is educational and is not legal, financial or immigration advice.</strong> For decisions about your immigration status, taxes, investments or legal matters, consult a licensed attorney, accountant or professional.</p>
+
+        <h2>3. No guaranteed results</h2>
+        <p>Our method organizes steps and reduces mistakes, but admissions, scholarships, financial aid, credit approvals, job offers and applications depend on third parties and your specific situation. We cannot guarantee a specific result.</p>
+
+        <h2>4. Your account</h2>
+        <ul>
+          <li>You are responsible for keeping your password private and for the information you share.</li>
+          <li>You must provide truthful data and keep it up to date.</li>
+          <li>If you are under 18, your parent or guardian must authorize the use of the account.</li>
+          <li>We may suspend accounts that misuse the platform.</li>
+        </ul>
+
+        <h2>5. Members-only content</h2>
+        <p>Some articles and courses are only for registered people or assigned clients. They are for your personal use: do not share or publish them.</p>
+
+        <h2>6. Acceptable use</h2>
+        <p>You may not upload illegal, offensive or third-party content, try to access other people’s data, or interfere with the site’s operation.</p>
+
+        <h2>7. Intellectual property</h2>
+        <p>The texts, courses, materials, design and trademarks on this site belong to 6SGS Consultants or its licensors. Success in the USA by 6SGS™ and Engineering Success in the USA™ are trademarks of 6SGS Consultants. You may use the materials for your own personal process, but not copy, resell or distribute them without written permission.</p>
+
+        <h2>8. Third-party services</h2>
+        <p>The platform uses Google Firebase, Cloudinary and Telegram, and links to external sites such as the 6SGS toolkit store, YouTube, Vimeo or press outlets. We are not responsible for their content or practices.</p>
+
+        <h2>9. Paid services</h2>
+        <p>Personalized services and toolkits may have a cost. Prices, scope and conditions of each service are agreed in writing before starting.</p>
+
+        <h2>10. Limitation of liability</h2>
+        <p>To the extent permitted by law, 6SGS Consultants will not be liable for indirect damages arising from the use of the site or from decisions made based on its educational content.</p>
+
+        <h2>11. Changes</h2>
+        <p>We may update these terms. We will publish the new version on this page with its date. If you keep using the site after a change, you accept the updated version.</p>
+
+        <h2>12. Contact</h2>
+        <p>If you have questions about these terms, write to <strong>PENDIENTE_CORREO</strong>.</p>
+      </div>
+    </section>
+  </div>
   </main>
 
   <footer class="pie">
     <div class="contenedor pie-legal">
       <p class="pie-bajo">
-        <span>© 2026 Success by Karely · 6SGS Consultants</span>
-        <a href="privacidad.html">Privacidad</a>
-        <a href="terminos.html" aria-current="page">Términos</a>
+        <span>© <span data-anio>2026</span> Success by Karely · 6SGS Consultants</span>
+        <a href="privacidad.html" data-i18n="pie.privacidad">Privacidad</a>
+        <a href="terminos.html" aria-current="page" data-i18n="pie.terminos">Términos</a>
+        <a href="#" data-preferencias-cookies hidden data-i18n="legal.cookiesPref">Preferencias de cookies</a>
       </p>
     </div>
   </footer>
